@@ -1,43 +1,164 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Text, View, ImageBackground } from "react-native";
+import {
+  CompassIcon,
+  HomeIcon,
+  LibraryBigIcon,
+  SearchIcon,
+  UserRoundIcon,
+} from "lucide-react-native";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function _layout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: "#efe4ef",
+        tabBarInactiveTintColor: "#efe4ef",
+        tabBarShowLabel: false,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          marginHorizontal: 6,
+          marginBottom: 30,
+          backgroundColor: "#160d15",
+          borderRadius: 50,
+          height: 56,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Home",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => {
+            return (
+              <View className="items-center justify-center">
+                {focused ? (
+                  <View className="bg-blue-600 rounded-full w-12 h-12 items-center justify-center -mt-4 border-4 border-background">
+                    <HomeIcon size={24} color="white" />
+                    <View className="absolute -bottom-6 text-center">
+                      <Text className="text-blue-400 text-xs font-medium">
+                        Home
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View className="items-center mt-2">
+                    <HomeIcon size={24} color={color} />
+                  </View>
+                )}
+              </View>
+            );
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => {
+            return (
+              <View className="items-center justify-center">
+                {focused ? (
+                  <View className="bg-blue-600 rounded-full w-12 h-12 items-center justify-center -mt-4 border-4 border-background">
+                    <SearchIcon size={24} color="white" />
+                    <View className="absolute -bottom-6 text-center">
+                      <Text className="text-blue-400 text-xs font-medium">
+                        Search
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View className="items-center mt-2">
+                    <SearchIcon size={24} color={color} />
+                  </View>
+                )}
+              </View>
+            );
+          },
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Explore",
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => {
+            return (
+              <View className="items-center justify-center">
+                {focused ? (
+                  <View className="bg-blue-600 rounded-full w-12 h-12 items-center justify-center -mt-4 border-4 border-background">
+                    <CompassIcon size={24} color="white" />
+                    <View className="absolute -bottom-6 text-center">
+                      <Text className="text-blue-400 text-xs font-medium">
+                        Explore
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View className="items-center mt-2">
+                    <CompassIcon size={24} color={color} />
+                  </View>
+                )}
+              </View>
+            );
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="catalogue"
+        options={{
+          title: "Catalogue",
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => {
+            return (
+              <View className="items-center justify-center">
+                {focused ? (
+                  <View className="bg-blue-600 rounded-full w-12 h-12 items-center justify-center -mt-4 border-4 border-background">
+                    <LibraryBigIcon size={24} color="white" />
+                    <View className="absolute -bottom-6 text-center">
+                      <Text className="text-blue-400 text-xs font-medium">
+                        Library
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View className="items-center mt-2">
+                    <LibraryBigIcon size={24} color={color} />
+                  </View>
+                )}
+              </View>
+            );
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          headerShown: false,
+          tabBarIcon: ({ focused, color }) => {
+            return (
+              <View className="items-center justify-center">
+                {focused ? (
+                  <View className="bg-blue-600 rounded-full w-12 h-12 items-center justify-center -mt-4 border-4 border-background">
+                    <UserRoundIcon size={24} color="white" />
+                    <View className="absolute -bottom-6 text-center">
+                      <Text className="text-blue-400 text-xs font-medium">
+                        Profile
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View className="items-center mt-2">
+                    <UserRoundIcon size={24} color={color} />
+                  </View>
+                )}
+              </View>
+            );
+          },
         }}
       />
     </Tabs>
