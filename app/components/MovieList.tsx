@@ -1,4 +1,4 @@
-import { View, FlatList } from "react-native";
+import { View, FlatList, Text } from "react-native";
 import React from "react";
 import MovieCard, { Movie } from "./MovieCard";
 
@@ -31,6 +31,13 @@ const MovieList = ({ movies }: { movies: Movie[] }) => {
         }}
         className="mt-2 pb-32"
         scrollEnabled={false}
+        ListEmptyComponent={
+          <View className="mt-10 justify-center items-center">
+            <Text className="text-lg font-semibold">
+              No data found
+            </Text>
+          </View>
+        }
       />
     </View>
   );

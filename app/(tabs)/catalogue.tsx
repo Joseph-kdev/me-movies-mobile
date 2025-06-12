@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const catalogue = () => {
+const Catalogue = () => {
   return (
     <View>
       <Text>catalogue</Text>
@@ -9,4 +9,4 @@ const catalogue = () => {
   )
 }
 
-export default catalogue
+export default Catalogue

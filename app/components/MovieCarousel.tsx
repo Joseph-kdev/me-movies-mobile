@@ -10,9 +10,10 @@ import {
 } from "react-native";
 import { fetchMovieDetails } from "../services/requests";
 import { useQueries } from "@tanstack/react-query";
+import { Play, Star } from "lucide-react-native";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-const CAROUSEL_HEIGHT = screenHeight * 0.3;
+const CAROUSEL_HEIGHT = screenHeight * 0.5;
 
 const CarouselComponent = () => {
   const images = [
@@ -21,13 +22,12 @@ const CarouselComponent = () => {
     { id: 157336, source: require("../../assets/images/interstellar.jpg") },
     { id: 372058, source: require("../../assets/images/your-name.jpg") },
     { id: 359724, source: require("../../assets/images/ford-v-ferrari.jpg") },
-    { id: 569094, source: require("../../assets/images/spiderman.jpg") },
     { id: 13, source: require("../../assets/images/forrest-gump.jpg") },
     { id: 872585, source: require("../../assets/images/oppenheimer.jpg") },
   ];
 
   const editorsChoiceIds = [
-    293660, 546554, 13, 372058, 157336, 359724, 569094, 872585,
+    293660, 546554, 13, 372058, 157336, 359724, 872585,
   ];
 
   const queries = editorsChoiceIds.map((movieId) => ({
@@ -76,28 +76,36 @@ const CarouselComponent = () => {
     return () => stopAutoplay();
   }, []);
 
-  const onMomentumScrollEnd = useCallback((event: { nativeEvent: { layoutMeasurement: { width: any; }; contentOffset: { x: number; }; }; }) => {
-    const slideSize = event.nativeEvent.layoutMeasurement.width;
-    const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
+  const onMomentumScrollEnd = useCallback(
+    (event: {
+      nativeEvent: {
+        layoutMeasurement: { width: any };
+        contentOffset: { x: number };
+      };
+    }) => {
+      const slideSize = event.nativeEvent.layoutMeasurement.width;
+      const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
 
-    if (index === 0) {
-      // Jump to the last real item
-      flatListRef.current?.scrollToOffset({
-        offset: images.length * slideSize,
-        animated: false,
-      });
-      setCurrentIndex(images.length - 1);
-    } else if (index === extendedImages.length - 1) {
-      // Jump to the first real item
-      flatListRef.current?.scrollToOffset({
-        offset: slideSize,
-        animated: false,
-      });
-      setCurrentIndex(0);
-    } else {
-      setCurrentIndex(index - 1); // Adjust for the duplicate at the start
-    }
-  }, [images.length]);
+      if (index === 0) {
+        // Jump to the last real item
+        flatListRef.current?.scrollToOffset({
+          offset: images.length * slideSize,
+          animated: false,
+        });
+        setCurrentIndex(images.length - 1);
+      } else if (index === extendedImages.length - 1) {
+        // Jump to the first real item
+        flatListRef.current?.scrollToOffset({
+          offset: slideSize,
+          animated: false,
+        });
+        setCurrentIndex(0);
+      } else {
+        setCurrentIndex(index - 1); // Adjust for the duplicate at the start
+      }
+    },
+    [images.length]
+  );
 
   const onScrollBeginDrag = useCallback(() => {
     // Stop autoplay when user starts dragging
@@ -128,6 +136,24 @@ const CarouselComponent = () => {
           style={styles.image}
           resizeMode="cover"
         />
+        <View style={styles.overlay}></View>
+        <View className="absolute left-8 bottom-16 z-10">
+          <Text className="text-text text-2xl mb-4">{item.data.title}</Text>
+          <View className="flex flex-row gap-2 mb-4">
+            {item.data.genres.map((genre) => (
+              <Text key={genre.id} className="bg-secondary text-text p-1.5 text-xs rounded-full">{genre.name}</Text>
+            ))}
+          </View>
+          <View className="flex-row items-center mb-2">
+            <Star height={15} color={"gold"} fill={"gold"} />
+            <Text className="text-text">
+              {Math.round(parseFloat(item.data.vote_average) * 10) / 10}
+            </Text>
+          </View>
+        </View>
+        <View className="absolute bottom-16 right-10 z-10">
+          <Play height={35} color={"#a3dcbc"} fill={"#a3dcbc"} />
+        </View>
       </View>
     );
   }, []);
@@ -175,10 +201,6 @@ const CarouselComponent = () => {
         />
       )}
 
-      <View style={styles.indicatorContainer}>
-        <Text style={styles.indicatorText}>{currentIndex + 1}</Text>
-      </View>
-
       <View style={styles.dotsContainer}>
         {images.map((_, index) => (
           <View
@@ -187,7 +209,7 @@ const CarouselComponent = () => {
               styles.dot,
               {
                 backgroundColor:
-                  index === currentIndex ? "#fff" : "rgba(255, 255, 255, 0.4)",
+                  index === currentIndex ? "#160d15" : "rgba(255, 255, 255, 0.214)",
                 transform: [{ scale: index === currentIndex ? 1.2 : 1 }],
               },
             ]}
@@ -222,26 +244,32 @@ const styles = StyleSheet.create({
   indicatorContainer: {
     position: "absolute",
     top: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.368)",
     borderRadius: 15,
     padding: 5,
-  },
-  indicatorText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   dotsContainer: {
     flexDirection: "row",
     position: "absolute",
-    bottom: 20,
+    bottom: 36,
     alignSelf: "center",
+    zIndex: 5,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     marginHorizontal: 4,
+  },
+  overlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.662)",
+    width: screenWidth * 0.9,
+    height: CAROUSEL_HEIGHT * 0.85,
+    borderRadius: 10,
+    zIndex: 9,
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
