@@ -13,12 +13,13 @@ export interface Movie {
     release_date?: string;
     first_air_date?: string;
     type: "tv" | "movie";
+    horizontal: boolean
 }
 
-const MovieCard = ({ id, poster_path, title, vote_average, release_date, type} : Movie) => {
+const MovieCard = ({ id, poster_path, title, vote_average, release_date, type, horizontal} : Movie) => {
   return (
-    <Link href={`/movies/${id}`} asChild>
-      <TouchableOpacity className='w-[32%]'>
+    <Link href={{pathname: type === "movie" ? `/movies/[id]` : `/tv/[id]`, params: {id : id}}} asChild>
+      <TouchableOpacity className={horizontal ? "w-36" : "w-[32%]"}>
         <Image
           source={{ uri: poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : `https://placehold.co/600x400/1a1a1a/FFFFFF.png` }}
           className='w-full h-52 rounded-sm'

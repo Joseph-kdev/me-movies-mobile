@@ -11,7 +11,7 @@ export default function Index() {
 
   return (
       <SafeAreaView className="bg-background flex-1">
-        <ScrollView className="flex-1 px-4 py-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ minHeight: "100%", paddingBottom: 10}}>
+        <ScrollView className="flex-1 px-2 py-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ minHeight: "100%", paddingBottom: 10}}>
           {/* <View className="bg-accent">
             <Image source={require("../../assets/images/Me-Movies.png")} resizeMode="cover" className="w-[100px] h-[100px]"/>
           </View> */}
@@ -31,7 +31,7 @@ export default function Index() {
               <Text>An error occurred</Text>
             ) : (
               <View>
-               <MovieList movies={movies}/>
+               <MovieList movies={movies} horizontal={true}/>
               </View>
             )}
           </View>

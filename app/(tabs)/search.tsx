@@ -35,7 +35,7 @@ const SearchPage = () => {
       ) : (
         <ScrollView className="flex-1 px-4 py-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ minHeight: "100%", paddingBottom: 10}}>
           {query.length > 0 ? <Text className="text-text mb-2">Search results for <Text className="font-bold text-accent text-lg">{query}</Text></Text> : <Text></Text>}
-          <MovieList movies={movies} />
+          <MovieList movies={movies} horizontal={false} />
         </ScrollView>
       )}
     </SafeAreaView>

@@ -32,7 +32,7 @@ const CarouselComponent = () => {
 
   const queries = editorsChoiceIds.map((movieId) => ({
     queryKey: ["movie", movieId],
-    queryFn: () => fetchMovieDetails({ id: movieId }),
+    queryFn: () => fetchMovieDetails({ id: movieId, type: "movie" }),
     enabled: !!movieId,
   }));
 
