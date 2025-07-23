@@ -9,19 +9,18 @@ const TMDB_CONFIG = {
     }
 }
 
-const cacheMovieDetails = async(movieId: number, data: any, type: string) => {
-    try {
-        await AsyncStorage.setItem(`${type}-${movieId}`, JSON.stringify(data))
-    } catch (error) {
-        console.log("Error occurred setting to asyncstorage", error)
-    }
-}
+// const cacheMovieDetails = async(movieId: number, data: any, type: string) => {
+//     try {
+//         await AsyncStorage.setItem(`${type}-${movieId}`, JSON.stringify(data))
+//     } catch (error) {
+//         console.log("Error occurred setting to asyncstorage", error)
+//     }
+// }
 
-const getCachedMovieDetails = async(movieId: number, type: string) => {
-    const data = await AsyncStorage.getItem(`${type}-${movieId}`)
-    console.log("returned from cached")
-    return data ? JSON.parse(data) : null
-}
+// const getCachedMovieDetails = async(movieId: number, type: string) => {
+//     const data = await AsyncStorage.getItem(`${type}-${movieId}`)
+//     return data ? JSON.parse(data) : null
+// }
 
 export const fetchMovies = async({query} : {query: string}) => {
     const endpoint = query ? `${TMDB_CONFIG.BASE_URL}search/multi?query=${query}` : `${TMDB_CONFIG.BASE_URL}trending/all/day`
@@ -41,10 +40,10 @@ export const fetchMovies = async({query} : {query: string}) => {
 }
 
 export const fetchMovieDetails = async({id, type} : {id:number; type: string;}) => {
-    const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?api_key=${TMDB_CONFIG.API_KEY}`
+    const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?api_key=${TMDB_CONFIG.API_KEY}&append_to_response=videos,credits`
 
-    const cached = await getCachedMovieDetails(id, type)
-    if (cached) return cached
+    // const cached = await getCachedMovieDetails(id, type)
+    // if (cached) return cached
 
     const response = await fetch(endpoint, {
         method: "GET",
@@ -57,7 +56,7 @@ export const fetchMovieDetails = async({id, type} : {id:number; type: string;}) 
     }
 
     const data = await response.json()
-    await cacheMovieDetails(id, data, type)
+    // await cacheMovieDetails(id, data, type)
     return data
 }
 

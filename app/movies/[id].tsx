@@ -5,6 +5,7 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +13,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMovieDetails } from "../services/requests";
 import { Star } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import YoutubePlayer from "react-native-youtube-iframe"
 
 const MovieDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -36,6 +39,15 @@ const MovieDetails = () => {
     queryKey: [`${id}`],
     queryFn: () => fetchMovieDetails({ id: id, type: "movie" }),
   });
+  
+  const officialTrailer = movie ? movie.videos.results.find(
+    (trailer: { type: string }) => trailer.type === "Trailer"
+  )
+    ? movie.videos.results.find(
+        (trailer: { type: string }) => trailer.type === "Trailer"
+      )
+    : movie.videos.results[0] : null
+
   console.log(movie);
   return (
     <SafeAreaView>
@@ -54,14 +66,17 @@ const MovieDetails = () => {
         </View>
       )}
       {movie && (
-        <View className="min-h-screen">
+        <View className="min-h-screen bg-background">
           <ScrollView
             className="flex-1"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 80 }}
           >
             <View className="relative">
-              <View className="bg-gradient-to-b from-transparent via-zinc-900 to-background absolute w-full h-[800px] z-10"></View>
+              <LinearGradient
+                colors={["transparent", "#18181b", "#160d15"]}
+                className="absolute w-full h-[800px] z-10"
+              ></LinearGradient>
               <Image
                 source={{
                   uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`,
@@ -70,7 +85,7 @@ const MovieDetails = () => {
                 resizeMode="cover"
               />
             </View>
-            <View className="mt-[400px] px-2 min-h-screen">
+            <View className="mt-[400px] px-2 min-h-screen z-20">
               <Text className="text-2xl font-bold mt-2 text-text">
                 {movie.title}
               </Text>
@@ -129,22 +144,58 @@ const MovieDetails = () => {
                   {movie?.release_date.split("-")[0]}
                 </Text>
               </View>
-            <View className="mt-6">
-              <Text
-                numberOfLines={isExpanded ? undefined : 4}
-                onTextLayout={onTextLayout}
-                className="text-text"
-              >
-                {movie.overview}
-              </Text>
-              {showReadMore && (
-                <TouchableOpacity onPress={toggleExpanded} className="mt-2">
-                  <Text className="text-blue-600 font-medium">
-                    {isExpanded ? "Read less" : "Read more"}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
+              <View className="mt-6">
+                <Text
+                  numberOfLines={isExpanded ? undefined : 4}
+                  onTextLayout={onTextLayout}
+                  className="text-text text-pretty"
+                >
+                  {movie.overview}
+                </Text>
+                {showReadMore && (
+                  <TouchableOpacity onPress={toggleExpanded} className="mt-2">
+                    <Text className="text-accent font-medium">
+                      {isExpanded ? "Read less" : "Read more"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View>
+                <Text className="mt-6 text-lg text-text">Top Cast</Text>
+                <FlatList
+                  data={movie.credits.cast}
+                  keyExtractor={(item) => item.id}
+                  horizontal
+                  maxToRenderPerBatch={4}
+                  ItemSeparatorComponent={() => <View className="w-2" />}
+                  renderItem={({ item }) => (
+                    <View className="flex flex-col items-center">
+                      <Image
+                        source={{
+                          uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
+                        }}
+                        className="rounded-full"
+                        resizeMode="cover"
+                        width={80}
+                        height={80}
+                      />
+                      <Text className="text-xs text-text mt-1">
+                        {item.name}
+                      </Text>
+                    </View>
+                  )}
+                  className="mt-2 pb-2"
+                />
+              </View>
+              <View className="mt-6">
+                <Text className="text-text text-lg">Trailer</Text>
+                {officialTrailer && (
+                  <YoutubePlayer 
+                    height={300}
+                    videoId={officialTrailer.id}
+                  />
+                )}
+              </View>
             </View>
           </ScrollView>
         </View>
