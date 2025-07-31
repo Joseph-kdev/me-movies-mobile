@@ -6,20 +6,23 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Platform,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMovieDetails } from "../services/requests";
-import { Star } from "lucide-react-native";
+import { ChevronLeft, Star } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import YoutubePlayer from "react-native-youtube-iframe"
+import { YoutubeView, useYouTubePlayer } from "react-native-youtube-bridge";
 
 const MovieDetails = () => {
   let { id } = useLocalSearchParams() as any;
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
+  const router = useRouter()
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -39,14 +42,27 @@ const MovieDetails = () => {
     queryKey: [`${id}`],
     queryFn: () => fetchMovieDetails({ id: id, type: "movie" }),
   });
-  
-  const officialTrailer = movie ? movie.videos.results.find(
-    (trailer: { type: string }) => trailer.type === "Trailer"
-  )
-    ? movie.videos.results.find(
-        (trailer: { type: string }) => trailer.type === "Trailer"
-      )
-    : movie.videos.results[0] : null
+
+  let officialTrailer = null;
+
+  if (movie) {
+    officialTrailer = movie
+      ? movie.videos.results.find(
+          (trailer: { type: string }) => trailer.type === "Trailer"
+        )
+        ? movie.videos.results.find(
+            (trailer: { type: string }) => trailer.type === "Trailer"
+          )
+        : movie.videos.results[0]
+      : null;
+  }
+  const player = useYouTubePlayer(movie ? officialTrailer.key : "" , {
+    autoplay: false,
+    controls: true,
+    playsinline: true,
+    rel: false,
+    muted: true,
+  });
 
   console.log(movie);
   return (
@@ -73,10 +89,14 @@ const MovieDetails = () => {
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 80 }}
           >
             <View className="relative">
+              <Pressable className="absolute top-4 left-2 z-50" onPress={() => router.back()}>
+                <ChevronLeft />
+              </Pressable>
               <LinearGradient
                 colors={["transparent", "#18181b", "#160d15"]}
                 className="absolute w-full h-[800px] z-10"
-              ></LinearGradient>
+              >
+              </LinearGradient>
               <Image
                 source={{
                   uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`,
@@ -189,10 +209,26 @@ const MovieDetails = () => {
               </View>
               <View className="mt-6">
                 <Text className="text-text text-lg">Trailer</Text>
-                {officialTrailer && (
-                  <YoutubePlayer 
-                    height={300}
-                    videoId={officialTrailer.id}
+                {officialTrailer ? (
+                  <YoutubeView
+                    useInlineHtml={false}
+                    player={player}
+                    height={Platform.OS === "web" ? "auto" : undefined}
+                    webViewProps={{
+                      renderToHardwareTextureAndroid: true,
+                    }}
+                    style={{
+                      maxWidth: 344,
+                    }}
+                    iframeStyle={{
+                      aspectRatio: 16 / 9,
+                    }}
+                  />
+                ) : (
+                  <ActivityIndicator
+                    size="large"
+                    color="white"
+                    style={{ alignSelf: "center" }}
                   />
                 )}
               </View>
