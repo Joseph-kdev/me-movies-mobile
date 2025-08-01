@@ -12,7 +12,7 @@ import { fetchMovieDetails } from "../services/requests";
 import { useQueries } from "@tanstack/react-query";
 import { Play, Star } from "lucide-react-native";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
 const CAROUSEL_HEIGHT = screenHeight * 0.5;
 
 const CarouselComponent = () => {
@@ -237,9 +237,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: screenWidth * 0.9,
+    width: screenWidth * 0.96,
     height: CAROUSEL_HEIGHT * 0.85,
-    borderRadius: 10,
   },
   indicatorContainer: {
     position: "absolute",
@@ -263,9 +262,8 @@ const styles = StyleSheet.create({
   },
   overlay: {
     backgroundColor: "rgba(0, 0, 0, 0.662)",
-    width: screenWidth * 0.9,
+    width: screenWidth * 0.96,
     height: CAROUSEL_HEIGHT * 0.85,
-    borderRadius: 10,
     zIndex: 9,
     position: "absolute",
     justifyContent: "center",

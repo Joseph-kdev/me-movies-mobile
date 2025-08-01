@@ -7,7 +7,7 @@ import MovieList from "../components/MovieList";
 
 export default function Index() {
 
-  const { data: movies, loading, error, refetch } = useFetch(() => fetchMovies({ query: ''}))
+  const { data: movies, loading, error} = useFetch(() => fetchMovies({ query: ''}))
 
   return (
       <SafeAreaView className="bg-background flex-1">

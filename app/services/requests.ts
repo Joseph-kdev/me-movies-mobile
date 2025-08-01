@@ -69,3 +69,29 @@ export const fetchTopRated = async({type} : {type: string}) => {
     const data = await response.json()
     return data.results
 }
+
+export const fetchByGenre = async({type, genre, page} : {type: string, genre: number[], page:number}) => {
+    const genresQuery = genre.length > 0 ? `&with_genres=${genre.join(',')}` : '';
+
+    let apiUrl;
+      if (type === 'movie') {
+        apiUrl = `${TMDB_CONFIG.BASE_URL}/discover/movie?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`;
+      } else if (type === 'tv') {
+        apiUrl = `${TMDB_CONFIG.BASE_URL}/discover/tv?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`;
+      } else {
+        console.log('error')
+        return
+      }
+
+      const response = await fetch(apiUrl, {
+        headers: TMDB_CONFIG.headers
+      })
+      
+      if(!response.ok) {
+        console.log("Error fetching this genre(s)")
+        return []
+      }
+
+      const data  = await response.json()
+      return data.results
+}

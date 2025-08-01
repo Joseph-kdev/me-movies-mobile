@@ -1,4 +1,4 @@
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList, Text, ActivityIndicator } from "react-native";
 import React from "react";
 import MovieCard, { Movie } from "./MovieCard";
 
@@ -15,7 +15,7 @@ const MovieList = ({
         <FlatList
           data={movies}
           horizontal
-          ItemSeparatorComponent={() => <View className="w-2"/>}
+          ItemSeparatorComponent={() => <View className="w-2" />}
           maxToRenderPerBatch={4}
           renderItem={({ item }) => (
             <MovieCard
@@ -32,7 +32,7 @@ const MovieList = ({
             />
           )}
           keyExtractor={(item) => item.id}
-          className="mt-2 pb-32"
+          className="mt-2"
         />
       ) : (
         <FlatList
@@ -64,7 +64,11 @@ const MovieList = ({
           scrollEnabled={false}
           ListEmptyComponent={
             <View className="mt-10 justify-center items-center">
-              <Text className="text-lg font-semibold">No data found</Text>
+              <ActivityIndicator
+                size="large"
+                color="white"
+                className="mt-10 self-center"
+              />
             </View>
           }
         />

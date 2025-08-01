@@ -64,7 +64,6 @@ const MovieDetails = () => {
     muted: true,
   });
 
-  console.log(movie);
   return (
     <SafeAreaView>
       {isLoading && (

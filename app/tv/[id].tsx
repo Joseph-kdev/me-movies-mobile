@@ -64,7 +64,6 @@ const TvDetails = () => {
     muted: true,
   });
 
-  console.log(tvShow);
   return (
     <SafeAreaView>
       {isLoading && (
