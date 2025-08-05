@@ -1,13 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TMDB_CONFIG = {
-    BASE_URL: "https://api.themoviedb.org/3/",
-    API_KEY: process.env.EXPO_PUBLIC_MOVIE_KEY,
-    headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${process.env.EXPO_PUBLIC_MOVIE_KEY}`
-    }
-}
+  BASE_URL: "https://api.themoviedb.org/3/",
+  API_KEY: process.env.EXPO_PUBLIC_MOVIE_KEY,
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer ${process.env.EXPO_PUBLIC_MOVIE_KEY}`,
+  },
+};
 
 // const cacheMovieDetails = async(movieId: number, data: any, type: string) => {
 //     try {
@@ -22,76 +22,87 @@ const TMDB_CONFIG = {
 //     return data ? JSON.parse(data) : null
 // }
 
-export const fetchMovies = async({query} : {query: string}) => {
-    const endpoint = query ? `${TMDB_CONFIG.BASE_URL}search/multi?query=${query}` : `${TMDB_CONFIG.BASE_URL}trending/all/day`
+export const fetchMovies = async ({ query }: { query: string }) => {
+  const endpoint = query
+    ? `${TMDB_CONFIG.BASE_URL}search/multi?query=${query}`
+    : `${TMDB_CONFIG.BASE_URL}trending/all/day`;
 
-    const response = await fetch(endpoint, {
-        method: "GET",
-        headers: TMDB_CONFIG.headers,
-    })
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: TMDB_CONFIG.headers,
+  });
 
-    if (!response.ok) {
-        console.log("Failed to fetch movies")
-        return []
+  if (!response.ok) {
+    console.log("Failed to fetch movies");
+    return [];
+  }
+
+  const data = await response.json();
+  return data.results;
+};
+
+export const fetchMovieDetails = async ({
+  id,
+  type,
+}: {
+  id: number;
+  type: string;
+}) => {
+  const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?api_key=${TMDB_CONFIG.API_KEY}&append_to_response=videos,credits`;
+
+  // const cached = await getCachedMovieDetails(id, type)
+  // if (cached) return cached
+
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: TMDB_CONFIG.headers,
+  });
+
+  if (!response.ok) {
+    console.log("Failed to fetch movie details");
+    return [];
+  }
+
+  const data = await response.json();
+  // await cacheMovieDetails(id, data, type)
+  return data;
+};
+
+export const fetchTopRated = async ({ type }: { type: string }) => {
+  const response = await fetch(
+    `${TMDB_CONFIG.BASE_URL}${type}/top_rated?api_key=${TMDB_CONFIG.API_KEY}`
+  );
+  if (!response.ok) {
+    console.log("Error fetching top rated movies");
+    return;
+  }
+  const data = await response.json();
+  return data.results;
+};
+
+export const fetchByGenre = async ({
+  type,
+  genre,
+  page,
+}: {
+  type: string;
+  genre: number[];
+  page: number;
+}) => {
+  const genresQuery = genre.length > 0 ? `&with_genres=${genre.join(",")}` : "";
+
+  const response = await fetch(
+    `${TMDB_CONFIG.BASE_URL}/discover/${type}?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`,
+    {
+      headers: TMDB_CONFIG.headers,
     }
+  );
 
-    const data = await response.json()
-    return data.results
-}
+  if (!response.ok) {
+    console.log("Error fetching this genre(s)");
+    return [];
+  }
 
-export const fetchMovieDetails = async({id, type} : {id:number; type: string;}) => {
-    const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?api_key=${TMDB_CONFIG.API_KEY}&append_to_response=videos,credits`
-
-    // const cached = await getCachedMovieDetails(id, type)
-    // if (cached) return cached
-
-    const response = await fetch(endpoint, {
-        method: "GET",
-        headers: TMDB_CONFIG.headers
-    })
-
-    if (!response.ok) {
-        console.log("Failed to fetch movie details")
-        return []
-    }
-
-    const data = await response.json()
-    // await cacheMovieDetails(id, data, type)
-    return data
-}
-
-export const fetchTopRated = async({type} : {type: string}) => {
-    const response = await fetch(`${TMDB_CONFIG.BASE_URL}${type}/top_rated?api_key=${TMDB_CONFIG.API_KEY}`)
-    if (!response.ok) {
-        console.log("Error fetching top rated movies")
-        return
-    }
-    const data = await response.json()
-    return data.results
-}
-
-export const fetchByGenre = async({type, genre, page} : {type: string, genre: number[], page:number}) => {
-    const genresQuery = genre.length > 0 ? `&with_genres=${genre.join(',')}` : '';
-
-    let apiUrl;
-      if (type === 'movie') {
-        apiUrl = `${TMDB_CONFIG.BASE_URL}/discover/movie?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`;
-      } else if (type === 'tv') {
-        apiUrl = `${TMDB_CONFIG.BASE_URL}/discover/tv?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`;
-      } else {
-        console.log('error')
-        return
-      }
-
-      const response = await fetch(apiUrl, {
-        headers: TMDB_CONFIG.headers
-      })
-      
-      if(!response.ok) {
-        console.log("Error fetching this genre(s)")
-        return []
-      }
-
-      const data  = await response.json()
-      return data.results
-}
+  const data = await response.json();
+  return data.results;
+};

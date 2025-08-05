@@ -22,7 +22,7 @@ const MovieDetails = () => {
   let { id } = useLocalSearchParams() as any;
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -56,7 +56,7 @@ const MovieDetails = () => {
         : movie.videos.results[0]
       : null;
   }
-  const player = useYouTubePlayer(movie ? officialTrailer.key : "" , {
+  const player = useYouTubePlayer(movie ? officialTrailer.key : "", {
     autoplay: false,
     controls: true,
     playsinline: true,
@@ -88,14 +88,16 @@ const MovieDetails = () => {
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 80 }}
           >
             <View className="relative">
-              <Pressable className="absolute top-4 left-2 z-50" onPress={() => router.back()}>
-                <ChevronLeft />
+              <Pressable
+                className="absolute top-4 left-2 z-50 bg-primary rounded-full flex justify-center p-1"
+                onPress={() => router.back()}
+              >
+                <ChevronLeft className="" />
               </Pressable>
               <LinearGradient
                 colors={["transparent", "#18181b", "#160d15"]}
                 className="absolute w-full h-[800px] z-10"
-              >
-              </LinearGradient>
+              ></LinearGradient>
               <Image
                 source={{
                   uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`,
@@ -208,28 +210,30 @@ const MovieDetails = () => {
               </View>
               <View className="mt-6">
                 <Text className="text-text text-lg">Trailer</Text>
-                {officialTrailer ? (
-                  <YoutubeView
-                    useInlineHtml={false}
-                    player={player}
-                    height={Platform.OS === "web" ? "auto" : undefined}
-                    webViewProps={{
-                      renderToHardwareTextureAndroid: true,
-                    }}
-                    style={{
-                      maxWidth: 344,
-                    }}
-                    iframeStyle={{
-                      aspectRatio: 16 / 9,
-                    }}
-                  />
-                ) : (
-                  <ActivityIndicator
-                    size="large"
-                    color="white"
-                    style={{ alignSelf: "center" }}
-                  />
-                )}
+                <View className="max-w-full flex justify-center items-center mt-2">
+                  {officialTrailer ? (
+                    <YoutubeView
+                      useInlineHtml={false}
+                      player={player}
+                      height={Platform.OS === "web" ? "auto" : undefined}
+                      webViewProps={{
+                        renderToHardwareTextureAndroid: true,
+                      }}
+                      style={{
+                        minWidth: 344,
+                      }}
+                      iframeStyle={{
+                        aspectRatio: 16 / 9,
+                      }}
+                    />
+                  ) : (
+                    <ActivityIndicator
+                      size="large"
+                      color="white"
+                      style={{ alignSelf: "center" }}
+                    />
+                  )}
+                </View>
               </View>
             </View>
           </ScrollView>

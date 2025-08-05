@@ -88,7 +88,7 @@ const TvDetails = () => {
             contentContainerStyle={{ minHeight: "100%", paddingBottom: 80 }}
           >
             <View className="relative">
-              <Pressable className="absolute top-4 left-2 z-50" onPress={() => router.back()}>
+              <Pressable className="absolute top-4 left-2 z-50 bg-primary p-1 rounded-full flex justify-center" onPress={() => router.back()}>
                 <ChevronLeft />
               </Pressable>
               <LinearGradient
@@ -208,6 +208,7 @@ const TvDetails = () => {
               </View>
               <View className="mt-6">
                 <Text className="text-text text-lg">Trailer</Text>
+                <View className="max-w-full flex justify-center items-center mt-2">
                 {officialTrailer ? (
                   <YoutubeView
                     useInlineHtml={false}
@@ -217,7 +218,7 @@ const TvDetails = () => {
                       renderToHardwareTextureAndroid: true,
                     }}
                     style={{
-                      maxWidth: 344,
+                      minWidth: 344,
                     }}
                     iframeStyle={{
                       aspectRatio: 16 / 9,
@@ -230,6 +231,7 @@ const TvDetails = () => {
                     style={{ alignSelf: "center" }}
                   />
                 )}
+                </View>
               </View>
             </View>
           </ScrollView>

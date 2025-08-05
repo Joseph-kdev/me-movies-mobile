@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   ScrollView
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchByGenre } from "../services/requests";
 import MovieList from "./MovieList";
@@ -174,6 +174,11 @@ export default function FilterComponent({ type }: { type: string }) {
       fetchByGenre({ type: type, genre: selectedGenre, page: page }),
     initialData: []
   });
+
+  useEffect(() => {
+    setSelectedGenre([])
+  }, [type])
+  
 
   return (
     <View className="flex-1">

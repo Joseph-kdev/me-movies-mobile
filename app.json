@@ -34,6 +34,18 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-font",
+         {
+          "fonts": [
+            "./assets/fonts/Buda.ttf",
+            "./assets/fonts/Oxanium.ttf",
+            "./assets/fonts/Poppins.ttf",
+            "./assets/fonts/RubikDirt.ttf",
+            "./assets/fonts/TiltNeon.ttf"
+          ]
+         }
       ]
     ],
     "experiments": {
