@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ApiResponse } from "../components/FilterComponent";
 
 const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3/",
@@ -22,7 +23,7 @@ const TMDB_CONFIG = {
 //     return data ? JSON.parse(data) : null
 // }
 
-export const fetchMovies = async ({ query }: { query: string }) => {
+export const fetchMovies = async (query: string) => {
   const endpoint = query
     ? `${TMDB_CONFIG.BASE_URL}search/multi?query=${query}`
     : `${TMDB_CONFIG.BASE_URL}trending/all/day`;
@@ -88,7 +89,7 @@ export const fetchByGenre = async ({
   type: string;
   genre: number[];
   page: number;
-}) => {
+}): Promise<ApiResponse> => {
   const genresQuery = genre.length > 0 ? `&with_genres=${genre.join(",")}` : "";
 
   const response = await fetch(
@@ -100,9 +101,14 @@ export const fetchByGenre = async ({
 
   if (!response.ok) {
     console.log("Error fetching this genre(s)");
-    return [];
+    throw new Error("Failed to fetch data")
   }
 
   const data = await response.json();
-  return data.results;
+  return {
+    results: data.results || [],
+    page: data.page,
+    total_pages: data.total_pages,
+    total_results: data.total_results,
+  };
 };

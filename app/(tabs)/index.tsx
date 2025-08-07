@@ -8,18 +8,24 @@ import {
 } from "react-native";
 import CarouselComponent from "../components/MovieCarousel";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFetch } from "../services/useFetch";
 import { fetchMovies } from "../services/requests";
 import MovieList from "../components/MovieList";
 import { Search } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Index() {
   const {
-    data: movies,
-    loading,
+    data: trending,
+    isLoading,
     error,
-  } = useFetch(() => fetchMovies({ query: "" }));
+  } = useQuery({
+    queryKey: ["trending"],
+    queryFn: () => fetchMovies(""),
+    staleTime: 3600000,
+  });
+
   const router = useRouter();
   return (
     <SafeAreaView className="bg-background flex-1">
@@ -28,6 +34,10 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
+        <LinearGradient
+          colors={["#18181b", "#160d15", "transparent"]}
+          className="absolute w-full h-[800px] z-1"
+        ></LinearGradient>
         <View className="flex-1 justify-center items-center">
           <Image
             source={require("../../assets/images/Me-Movies.png")}
@@ -47,7 +57,7 @@ export default function Index() {
         </Pressable>
         <View>
           <Text className="text-text mb-2">Trending</Text>
-          {loading ? (
+          {isLoading ? (
             <ActivityIndicator
               size="large"
               color="white"
@@ -57,7 +67,7 @@ export default function Index() {
             <Text>An error occurred</Text>
           ) : (
             <View>
-              <MovieList movies={movies} horizontal={true} />
+              <MovieList movies={trending} horizontal={true} />
             </View>
           )}
         </View>

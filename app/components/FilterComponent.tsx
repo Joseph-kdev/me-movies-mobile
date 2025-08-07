@@ -4,12 +4,22 @@ import {
   FlatList,
   Pressable,
   ActivityIndicator,
-  ScrollView
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchByGenre } from "../services/requests";
 import MovieList from "./MovieList";
+import { Movie } from "./MovieCard";
+
+export interface ApiResponse {
+  results: Movie[];
+  page: number;
+  total_pages: number;
+  total_results: number;
+}
 
 const movieGenres = [
   {
@@ -159,7 +169,6 @@ const tvGenres = [
 
 export default function FilterComponent({ type }: { type: string }) {
   const [selectedGenre, setSelectedGenre] = useState<number[]>([]);
-  const [page, setPage] = useState(1);
 
   const handleGenreSelect = (genre: number) => {
     const updatedGenres = selectedGenre.includes(genre)
@@ -168,18 +177,50 @@ export default function FilterComponent({ type }: { type: string }) {
     setSelectedGenre(updatedGenres);
   };
 
-  const { data, isLoading, isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<ApiResponse, Error>({
     queryKey: [`results-${type}-${selectedGenre}`],
-    queryFn: () =>
-      fetchByGenre({ type: type, genre: selectedGenre, page: page }),
-    initialData: []
+    queryFn: ({ pageParam }) =>
+      fetchByGenre({ type: type, genre: selectedGenre, page: pageParam }),
+    getNextPageParam: (lastPage: ApiResponse) => {
+      if (lastPage.page < lastPage.total_pages) {
+        const nextPage = lastPage.page + 1;
+        return nextPage;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 
   useEffect(() => {
-    setSelectedGenre([])
-  }, [type])
-  
+    setSelectedGenre([]);
+  }, [type]);
 
+  const allMovies: Movie[] = data?.pages?.flatMap((page) => page.results) || [];
+
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 40;
+
+    if (
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom
+    ) {
+      handleLoadMore();
+    }
+  };
   return (
     <View className="flex-1">
       <FlatList
@@ -211,7 +252,9 @@ export default function FilterComponent({ type }: { type: string }) {
       <ScrollView
         className="flex-1 px-2"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+        contentContainerStyle={{ minHeight: "100%", paddingBottom: 20 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
       >
         {isLoading ? (
           <ActivityIndicator
@@ -223,7 +266,21 @@ export default function FilterComponent({ type }: { type: string }) {
           <Text>An error occurred</Text>
         ) : (
           <View>
-            <MovieList movies={data} horizontal={false} />
+            <MovieList movies={allMovies} horizontal={false} />
+            {isFetchingNextPage && (
+              <ActivityIndicator
+                size="small"
+                color="white"
+                className="mt-4 self-center"
+              />
+            )}
+
+            {/* End of results indicator */}
+            {!hasNextPage && allMovies.length > 0 && (
+              <Text className="text-center mt-4 text-gray-500">
+                No more results
+              </Text>
+            )}
           </View>
         )}
       </ScrollView>

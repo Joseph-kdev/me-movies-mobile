@@ -1,4 +1,4 @@
-import { Text, ActivityIndicator, ScrollView } from "react-native";
+import { Text, ActivityIndicator, ScrollView, View } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBar from "../components/SearchBar";
@@ -17,12 +17,17 @@ const SearchPage = () => {
     isError,
   } = useQuery({
     queryKey: [`${debouncedText}`],
-    queryFn: () => fetchMovies({ query: debouncedText }),
-    initialData: () => fetchMovies({ query: "" }),
+    queryFn: () => fetchMovies(debouncedText),
+    initialData: () => fetchMovies(""),
   });
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <View>
+        <Text className="text-text text-center mt-6 mb-2" style={{ fontFamily: "RubikDirt", fontSize: 32}} >
+          Search
+        </Text>
+      </View>
       <SearchBar query={query} setQuery={setQuery} />
       {isLoading ? (
         <ActivityIndicator
