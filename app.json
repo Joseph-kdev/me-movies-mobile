@@ -9,7 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.memoviesmobile",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +19,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.memoviesmobile"
+      "package": "com.anonymous.memoviesmobile",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -26,6 +29,8 @@
     },
     "plugins": [
       "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
       [
         "expo-splash-screen",
         {
@@ -37,7 +42,7 @@
       ],
       [
         "expo-font",
-         {
+        {
           "fonts": [
             "./assets/fonts/Buda.ttf",
             "./assets/fonts/Oxanium.ttf",
@@ -45,12 +50,27 @@
             "./assets/fonts/RubikDirt.ttf",
             "./assets/fonts/TiltNeon.ttf"
           ]
-         }
-      ]
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "turboModules": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a370d28d-1c0c-4915-81f6-d74f4073885a"
+      }
     }
   }
 }

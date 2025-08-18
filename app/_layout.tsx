@@ -52,6 +52,14 @@ export default function RootLayout() {
                 name="tv/[id]"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="auth/Login"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="auth/Signup"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </GestureHandlerRootView>
         </QueryClientProvider>
