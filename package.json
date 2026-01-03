@@ -16,6 +16,7 @@
     "@react-native-firebase/app": "^23.0.1",
     "@react-native-firebase/auth": "^23.0.1",
     "@react-native-firebase/firestore": "^23.0.1",
+    "@react-native-google-signin/google-signin": "^16.0.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
@@ -38,7 +39,8 @@
     "expo-web-browser": "~14.2.0",
     "lodash": "^4.17.21",
     "lucide-react-native": "^0.511.0",
-    "nativewind": "^4.1.23",
+    "nativewind": "~4.1.23",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
@@ -50,7 +52,7 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "react-native-youtube-bridge": "^2.1.1",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^3.4.19",
     "use-debounce": "^10.0.5"
   },
   "devDependencies": {

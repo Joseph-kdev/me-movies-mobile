@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ApiResponse } from "../components/FilterComponent";
+import firestore, { collection, getDocs, getFirestore } from "@react-native-firebase/firestore"
 
 const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3/",
@@ -112,3 +113,17 @@ export const fetchByGenre = async ({
     total_results: data.total_results,
   };
 };
+
+export const userLists = async(listType: string, userId: string) => {
+  if(!userId) return 
+  const db = getFirestore()
+  const collectionRef = collection(db, `users/${userId}/${listType}`)
+  const snapshot = await getDocs(collectionRef)
+
+  const retrievedData = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }))
+
+  return retrievedData
+}

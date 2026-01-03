@@ -5,27 +5,42 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "react-native";
 import { useEffect, useState } from "react";
-import * as Font from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
+import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { AuthProvider } from "./AuthContext";
 
 export default function RootLayout() {
   const queryClient = new QueryClient();
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>();
+
+  const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
+    console.log("onAuthStateChanged", user);
+    setUser(user);
+    if (initializing) setInitializing(false);
+  };
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
 
   useEffect(() => {
     async function loadFonts() {
       try {
         await Font.loadAsync({
-          'Buda': require('../assets/fonts/Buda.ttf'),
-          'Oxanium': require('../assets/fonts/Oxanium.ttf'),
-          'Poppins': require('../assets/fonts/Poppins.ttf'),
-          'RubikDirt': require('../assets/fonts/RubikDirt.ttf'),
-          'TiltNeon': require('../assets/fonts/TiltNeon.ttf'),
+          Buda: require("../assets/fonts/Buda.ttf"),
+          Oxanium: require("../assets/fonts/Oxanium.ttf"),
+          Poppins: require("../assets/fonts/Poppins.ttf"),
+          RubikDirt: require("../assets/fonts/RubikDirt.ttf"),
+          TiltNeon: require("../assets/fonts/TiltNeon.ttf"),
         });
         setFontsLoaded(true);
       } catch (error) {
-        console.error('Error loading fonts:', error);
+        console.error("Error loading fonts:", error);
       } finally {
         await SplashScreen.hideAsync();
       }
@@ -40,29 +55,19 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar hidden={true} />
-        <QueryClientProvider client={queryClient}>
-          <GestureHandlerRootView>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="movies/[id]"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="tv/[id]"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="auth/Login"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="auth/Signup"
-                options={{ headerShown: false }}
-              />
-            </Stack>
-          </GestureHandlerRootView>
-        </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+        <GestureHandlerRootView>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="movies/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="tv/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="auth/Login" options={{ headerShown: false }} />
+            <Stack.Screen name="auth/Signup" options={{ headerShown: false }} />
+          </Stack>
+        </GestureHandlerRootView>
+        </AuthProvider>
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
