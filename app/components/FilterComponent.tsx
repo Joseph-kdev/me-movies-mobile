@@ -13,6 +13,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchByGenre } from "../services/requests";
 import MovieList from "./MovieList";
 import { Movie } from "./MovieCard";
+import { LoaderKitView } from "react-native-loader-kit";
 
 export interface ApiResponse {
   results: Movie[];
@@ -231,13 +232,13 @@ export default function FilterComponent({ type }: { type: string }) {
         renderItem={({ item }) => (
           <Pressable
             key={item.id}
-            className={`p-1 rounded-md max-h-8 ${
+            className={`flex justify-center items-center px-2 rounded-full max-h-8 ${
               selectedGenre.includes(item.id) ? "bg-accent" : "bg-secondary"
             }`}
             onPress={() => handleGenreSelect(item.id)}
           >
             <Text
-              className={`${
+              className={`text-xs ${
                 selectedGenre.includes(item.id)
                   ? "text-background"
                   : "text-text"
@@ -257,11 +258,13 @@ export default function FilterComponent({ type }: { type: string }) {
         scrollEventThrottle={100}
       >
         {isLoading ? (
-          <ActivityIndicator
-            size="large"
-            color="white"
-            className="mt-10 self-center"
-          />
+          <View className="min-h-['90%'] bg-background flex justify-center items-center">
+            <LoaderKitView
+              name="Pacman"
+              style={{ width: 50, height: 50 }}
+              color={"#efe4ef"}
+            />
+          </View>
         ) : isError ? (
           <Text>An error occurred</Text>
         ) : (
@@ -269,9 +272,9 @@ export default function FilterComponent({ type }: { type: string }) {
             <MovieList movies={allMovies} horizontal={false} />
             {isFetchingNextPage && (
               <ActivityIndicator
-                size="small"
+                size="large"
                 color="white"
-                className="mt-4 self-center"
+                className="mt-10 self-center"
               />
             )}
 

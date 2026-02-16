@@ -26,7 +26,6 @@ const MovieCard = ({ id, poster_path, title, vote_average, release_date, type, h
           resizeMode='cover'
           />
           <View className='bg-[rgba(0,0,0,0.5)] p-1'>
-            <Text numberOfLines={1} className='text-text'>{title}</Text>
             <View className='flex flex-row-reverse justify-between mt-1'>
               <View className='flex-row items-center'>
                 <Star height={15} color={"gold"} fill={"gold"}/> 

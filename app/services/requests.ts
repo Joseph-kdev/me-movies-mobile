@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ApiResponse } from "../components/FilterComponent";
-import firestore, { collection, getDocs, getFirestore } from "@react-native-firebase/firestore"
+import firestore, { addDoc, collection, getDocs, getFirestore, query, where } from "@react-native-firebase/firestore"
+import { User } from "@react-native-google-signin/google-signin";
 
 const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3/",

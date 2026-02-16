@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import "./globals.css";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -14,6 +14,8 @@ export default function RootLayout() {
   const queryClient = new QueryClient();
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>();
+  const router = useRouter();
+  const segments = useSegments();
 
   const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
     console.log("onAuthStateChanged", user);
@@ -57,15 +59,14 @@ export default function RootLayout() {
       <StatusBar hidden={true} />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-        <GestureHandlerRootView>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="movies/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="tv/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="auth/Login" options={{ headerShown: false }} />
-            <Stack.Screen name="auth/Signup" options={{ headerShown: false }} />
-          </Stack>
-        </GestureHandlerRootView>
+          <GestureHandlerRootView>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="movies/[id]" options={{ headerShown: false }} />
+              <Stack.Screen name="tv/[id]" options={{ headerShown: false }} />
+              <Stack.Screen name="auth/Signup" options={{ headerShown: false }} />
+            </Stack>
+          </GestureHandlerRootView>
         </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

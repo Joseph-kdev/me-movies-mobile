@@ -1,4 +1,10 @@
-import { EyeOff, Lock, Mail, Paperclip } from "lucide-react-native";
+import {
+  ChevronLeft,
+  EyeOff,
+  Lock,
+  Mail,
+  Paperclip,
+} from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
@@ -10,6 +16,8 @@ import {
   StatusBar,
   Alert,
   ActivityIndicator,
+  Pressable,
+  Image
 } from "react-native";
 import {
   getAuth,
@@ -24,6 +32,7 @@ import {
   isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { useRouter } from "expo-router";
 
 export default function Signup() {
   const [screen, setScreen] = useState("signin");
@@ -31,6 +40,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const auth = getAuth();
+  const router = useRouter();
 
   const isSignIn = screen === "signin";
 
@@ -46,6 +56,7 @@ export default function Signup() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert("Signed in successfully!");
+      router.push("/(tabs)/catalogue")
     } catch (error) {
       console.error("Sign in error:", error);
       alert(`Sign in failed: ${error.message}`);
@@ -59,6 +70,7 @@ export default function Signup() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Account created successfully!");
+      router.push("/(tabs)/catalogue")
     } catch (error) {
       console.error("Sign up error:", error);
       alert(`Registration failed: ${error.message}`);
@@ -74,22 +86,22 @@ export default function Signup() {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
-      
+
       // Get the users ID token
       const signInResult = await GoogleSignin.signIn();
 
       if (isSuccessResponse(signInResult)) {
         console.log("Google sign in success");
-        
+
         // Create a Firebase credential with the token
         const googleCredential = GoogleAuthProvider.credential(
-          signInResult.data.idToken
+          signInResult.data.idToken,
         );
-        
+
         // Sign in with Firebase
         await signInWithCredential(auth, googleCredential);
         console.log("Firebase authentication successful!");
-        
+        router.push("/(tabs)/catalogue")
       } else {
         alert("Google sign in cancelled");
       }
@@ -116,25 +128,34 @@ export default function Signup() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaView className="flex-1 bg-background">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView contentContainerClassName="flex-grow justify-center px-5">
-        <View className="bg-white rounded-3xl p-8 items-center shadow-lg">
-          {/* Logo */}
+        <Pressable
+          className="absolute top-4 left-4 z-50 bg-secondary/40 rounded-full flex justify-center p-1"
+          onPress={() => router.back()}
+        >
+          <ChevronLeft className="" stroke={"white"} />
+        </Pressable>
+        <View className="bg-primary/80 rounded-3xl p-8 items-center shadow-lg">
           <View className="mb-8">
-            <View className="w-20 h-20 rounded-full bg-red-50 justify-center items-center">
-              <Paperclip size={40} color="#ff3b5c" />
+            <View className="w-20 h-20 justify-center items-center">
+                <Image
+                  source={require("../../assets/images/Me-Movies.png")}
+                  resizeMode="cover"
+                  className="w-[80px] h-[80px] rounded-md mt-6"
+                />
             </View>
           </View>
 
           {/* Title & Subtitle */}
-          <Text className="text-3xl font-semibold text-gray-800 mb-2">
+          <Text className="text-2xl font-semibold text-text mb-3">
             {isSignIn ? "Sign In" : "Sign Up"}
           </Text>
 
           {/* Form Inputs */}
           <View className="w-full space-y-4">
-            <View className="flex-row items-center bg-gray-100 rounded-2xl px-3 py-2 mb-1">
+            <View className="flex-row items-center bg-gray-100 rounded-2xl px-3 py-1 mb-2">
               <Mail size={20} color="#aaa" />
               <TextInput
                 className="flex-1 ml-3 text-base text-gray-700"
@@ -146,9 +167,9 @@ export default function Signup() {
                 editable={!loading}
               />
             </View>
-            
+
             {/* Password */}
-            <View className="flex-row items-center bg-gray-100 rounded-2xl px-3 py-2 mb-1">
+            <View className="flex-row items-center bg-gray-100 rounded-2xl px-3 py-1 mb-1">
               <Lock size={20} color="#aaa" />
               <TextInput
                 className="flex-1 ml-3 text-base text-gray-700"
@@ -167,21 +188,21 @@ export default function Signup() {
             {/* Forgot Password */}
             {isSignIn && (
               <TouchableOpacity className="self-end mb-4">
-                <Text className="text-primary text-sm">Forgot Password?</Text>
+                <Text className="text-text text-sm">Forgot Password?</Text>
               </TouchableOpacity>
             )}
           </View>
 
           {/* Primary Button */}
           <TouchableOpacity
-            className="w-full bg-primary py-3 rounded-full items-center mt-2 mb-5"
+            className="w-full bg-accent py-3 rounded-full items-center mt-2 mb-5"
             onPress={isSignIn ? signIn : signUp}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="text-white text-lg font-semibold">
+              <Text className="text-primary text-lg font-semibold">
                 {isSignIn ? "Sign In" : "Sign Up"}
               </Text>
             )}
@@ -191,25 +212,25 @@ export default function Signup() {
 
           {/* Google Button */}
           <TouchableOpacity
-            className="flex-row w-full bg-gray-100 py-3.5 rounded-full items-center justify-center mb-3"
+            className="flex-row w-full bg-gray-400 py-3.5 rounded-full items-center justify-center mb-3"
             onPress={onGoogleButtonPress}
             disabled={loading}
           >
-            <Text className="ml-3 text-gray-700 text-base">
+            <Text className="ml-3 text-text text-base">
               Sign in with Google
             </Text>
           </TouchableOpacity>
 
           {/* Bottom Link */}
           <View className="flex-row">
-            <Text className="text-gray-500 text-sm">
+            <Text className="text-text text-sm">
               {isSignIn ? "Don't have account? " : "Already have an account? "}
             </Text>
             <TouchableOpacity
               onPress={() => setScreen(isSignIn ? "signup" : "signin")}
               disabled={loading}
             >
-              <Text className="text-primary text-sm font-semibold">
+              <Text className="text-accent text-sm font-semibold">
                 {isSignIn ? "Sign Up" : "Sign In"}
               </Text>
             </TouchableOpacity>

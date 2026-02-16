@@ -16,16 +16,16 @@ const Explore = () => {
           Explore
         </Text>
       </View>
-      <View className="flex flex-row mx-2 mb-[4px]">
+      <View className="flex flex-row mx-2 mb-[4px] bg-primary rounded-full">
         <Pressable
           onPress={() => setActiveTab("movie")}
-          className={`w-1/2 py-2 ${
-            activeTab === "movie" ? "bg-[rgba(0,0,0,0.6)]" : ""
+          className={`w-1/2 py-2 rounded-full ${
+            activeTab === "movie" ? "bg-accent" : ""
           }`}
         >
           <Text
             className={`${
-              activeTab === "movie" ? "text-accent" : "text-text"
+              activeTab === "movie" ? "text-background" : "text-text"
             } text-center`}
           >
             Movies
@@ -33,13 +33,13 @@ const Explore = () => {
         </Pressable>
         <Pressable
           onPress={() => setActiveTab("tv")}
-          className={`w-1/2 py-2 ${
-            activeTab === "tv" ? "bg-[rgba(0,0,0,0.6)]" : ""
+          className={`w-1/2 py-2 rounded-full ${
+            activeTab === "tv" ? "bg-accent" : ""
           }`}
         >
           <Text
             className={`${
-              activeTab === "tv" ? "text-accent" : "text-text"
+              activeTab === "tv" ? "text-background" : "text-text"
             } text-center`}
           >
             Tv Shows
