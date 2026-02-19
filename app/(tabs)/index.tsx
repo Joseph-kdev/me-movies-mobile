@@ -47,7 +47,7 @@ export default function Index() {
       <ScrollView
         className="flex-1 px-2"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+        contentContainerStyle={{ minHeight: "100%", paddingBottom: 60 }}
       >
         <View className="absolute top-2 right-1 left-1 z-20 flex flex-row justify-between items-center">
           <Image

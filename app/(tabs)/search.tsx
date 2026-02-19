@@ -5,11 +5,12 @@ import SearchBar from "../components/SearchBar";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMovies } from "../services/requests";
 import MovieList from "../components/MovieList";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
+import LoaderKitView from "react-native-loader-kit";
 
 const SearchPage = () => {
   const [query, setQuery] = useState("");
-   const [debouncedText] = useDebounce(query, 300);
+  const [debouncedText] = useDebounce(query, 300);
 
   const {
     data: movies,
@@ -24,22 +25,39 @@ const SearchPage = () => {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View>
-        <Text className="text-text text-center mt-6 mb-2" style={{ fontFamily: "RubikDirt", fontSize: 32}} >
+        <Text
+          className="text-text text-center mt-6 mb-2"
+          style={{ fontFamily: "RubikDirt", fontSize: 32 }}
+        >
           Search
         </Text>
       </View>
       <SearchBar query={query} setQuery={setQuery} />
       {isLoading ? (
-        <ActivityIndicator
-          size="large"
-          color="white"
-          className="mt-10 self-center"
-        />
+        <View className="flex flex-1 self-center justify-center items-center min-h-screen">
+          <LoaderKitView
+            name="BallClipRotateMultiple"
+            style={{ width: 50, height: 50 }}
+            color={"#efe4ef"}
+            className="mt-20"
+          />
+        </View>
       ) : isError ? (
         <Text className="text-text">An error occurred</Text>
       ) : (
-        <ScrollView className="flex-1 px-4 py-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ minHeight: "100%", paddingBottom: 10}}>
-          {query.length > 0 ? <Text className="text-text mb-2">Search results for <Text className="font-bold text-accent text-lg">{query}</Text></Text> : <Text></Text>}
+        <ScrollView
+          className="flex-1 px-4 py-2"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+        >
+          {query.length > 0 ? (
+            <Text className="text-text mb-2">
+              Search results for{" "}
+              <Text className="font-bold text-accent text-lg">{query}</Text>
+            </Text>
+          ) : (
+            <Text></Text>
+          )}
           <MovieList movies={movies} horizontal={false} />
         </ScrollView>
       )}

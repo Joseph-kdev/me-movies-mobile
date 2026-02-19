@@ -14,7 +14,7 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMovieDetails } from "../services/requests";
+import { fetchMovieDetails, getSimilarMovies } from "../services/requests";
 import {
   BookmarkMinus,
   BookmarkPlus,
@@ -37,6 +37,7 @@ import {
   where,
 } from "@react-native-firebase/firestore";
 import LoaderKitView from "react-native-loader-kit";
+import MovieList from "../components/MovieList";
 
 const MovieDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -67,6 +68,18 @@ const MovieDetails = () => {
   } = useQuery({
     queryKey: [`${id}`],
     queryFn: () => fetchMovieDetails({ id: id, type: "movie" }),
+  });
+
+  const {
+    data: similarMovies,
+    isLoading: isLoadingSimilar,
+    error: errorSimilar,
+  } = useQuery({
+    queryKey: ["similar-movies", `${id}-movie`],
+    queryFn: () => getSimilarMovies(id, "movie"),
+    enabled: !!movie, // only fetch when movie exists
+    staleTime: 1000 * 60 * 30, // 30 minutes – similar lists don't change often
+    gcTime: 1000 * 60 * 60, // keep in cache 1 hour
   });
 
   let officialTrailer = null;
@@ -252,13 +265,13 @@ const MovieDetails = () => {
   return (
     <SafeAreaView>
       {isLoading && (
-          <View className="min-h-screen bg-background flex justify-center items-center">
-            <LoaderKitView
-              name="BallBeat"
-              style={{ width: 50, height: 50 }}
-              color={"#efe4ef"}
-            />
-          </View>
+        <View className="min-h-screen bg-background flex justify-center items-center">
+          <LoaderKitView
+            name="BallBeat"
+            style={{ width: 50, height: 50 }}
+            color={"#efe4ef"}
+          />
+        </View>
       )}
       {isError && (
         <View>
@@ -270,7 +283,7 @@ const MovieDetails = () => {
           <ScrollView
             className="flex-1"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ minHeight: "100%", paddingBottom: 80 }}
+            contentContainerStyle={{ minHeight: "100%", paddingBottom: 60 }}
           >
             <View className="relative">
               <Pressable
@@ -497,6 +510,25 @@ const MovieDetails = () => {
                   )}
                 </View>
               </View>
+            </View>
+            <View className="mt-6 px-2">
+              <Text className="text-text mb-1">Similar Vibes</Text>
+              {isLoadingSimilar ? (
+                <View className="flex flex-1 self-center justify-center items-center">
+                  <LoaderKitView
+                    name="BallClipRotateMultiple"
+                    style={{ width: 50, height: 50 }}
+                    color={"#efe4ef"}
+                    className="mt-20"
+                  />
+                </View>
+              ) : errorSimilar ? (
+                <Text>An error occurred</Text>
+              ) : (
+                <View>
+                  <MovieList movies={similarMovies ?? []} horizontal={true} />
+                </View>
+              )}
             </View>
           </ScrollView>
         </View>

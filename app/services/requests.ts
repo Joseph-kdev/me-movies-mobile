@@ -150,3 +150,23 @@ export const userLists = async (listType: string, userId: string) => {
 
   return retrievedData;
 };
+
+export const getSimilarMovies = async (id: number | string, type: string): Promise<any[]> => {
+  if (!id) return [];
+
+  const response = await fetch(
+    `${TMDB_CONFIG.BASE_URL}${type}/${id}/similar?language=en-US&page=1`,
+    {
+      method: "GET",
+      headers: TMDB_CONFIG.headers,
+    }
+  );
+
+  if (!response.ok) {
+    console.error(`Failed to fetch similar movies for ID ${id}:`, response.status);
+    return [];
+  }
+
+  const data = await response.json();
+  return data.results || [];
+};
