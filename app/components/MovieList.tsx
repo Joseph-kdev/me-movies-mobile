@@ -1,4 +1,4 @@
-import { View, FlatList, Text, ActivityIndicator } from "react-native";
+import { View, FlatList, ActivityIndicator } from "react-native";
 import React from "react";
 import MovieCard, { Movie } from "./MovieCard";
 
@@ -16,7 +16,7 @@ const MovieList = ({
           data={movies}
           horizontal
           ItemSeparatorComponent={() => <View className="w-2" />}
-          maxToRenderPerBatch={4}
+          maxToRenderPerBatch={10}
           renderItem={({ item }) => (
             <MovieCard
               id={item.id}

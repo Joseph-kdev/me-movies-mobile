@@ -54,6 +54,7 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "react-native-youtube-bridge": "^2.1.1",
+    "sonner-native": "^0.23.1",
     "tailwindcss": "^3.4.19",
     "use-debounce": "^10.0.5"
   },

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { fetchMovieDetails } from "../services/requests";
 import { useQueries } from "@tanstack/react-query";
@@ -26,9 +27,7 @@ const CarouselComponent = () => {
     { id: 872585, source: require("../../assets/images/oppenheimer.jpg") },
   ];
 
-  const editorsChoiceIds = [
-    293660, 546554, 13, 372058, 157336, 359724, 872585,
-  ];
+  const editorsChoiceIds = [293660, 546554, 13, 372058, 157336, 359724, 872585];
 
   const queries = editorsChoiceIds.map((movieId) => ({
     queryKey: ["movie", movieId],
@@ -104,7 +103,7 @@ const CarouselComponent = () => {
         setCurrentIndex(index - 1); // Adjust for the duplicate at the start
       }
     },
-    [images.length]
+    [images.length],
   );
 
   const onScrollBeginDrag = useCallback(() => {
@@ -137,23 +136,25 @@ const CarouselComponent = () => {
           resizeMode="cover"
         />
         <View style={styles.overlay}></View>
-        <View className="absolute left-8 bottom-16 z-10">
+        <View className="absolute left-2 bottom-10 z-10">
           <Text className="text-text text-2xl mb-4">{item.data.title}</Text>
-          <View className="flex flex-row gap-2 mb-4">
-            {item.data.genres.map((genre) => (
-              <Text key={genre.id} className="bg-secondary text-text p-1.5 text-xs rounded-full">{genre.name}</Text>
-            ))}
-          </View>
-          <View className="flex-row items-center mb-2">
+          <View className="flex-row items-center">
             <Star height={15} color={"gold"} fill={"gold"} />
             <Text className="text-text">
               {Math.round(parseFloat(item.data.vote_average) * 10) / 10}
             </Text>
           </View>
+          <View></View>
         </View>
-        <View className="absolute bottom-16 right-10 z-10">
-          <Play height={35} color={"#a3dcbc"} fill={"#a3dcbc"} />
-        </View>
+        <TouchableOpacity
+          className="absolute bottom-10 right-2 z-10 flex flex-row items-center bg-gray-800 p-1 rounded-md active:opacity-70"
+          onPress={() =>
+            router.push({ pathname: "/movies/[id]", params: { id: item.id } })
+          }
+        >
+          <Play height={12} color="#a3dcbc" fill="#a3dcbc" />
+          <Text className="text-text text-sm ml-1">Watch Trailer</Text>
+        </TouchableOpacity>
       </View>
     );
   }, []);
@@ -164,7 +165,7 @@ const CarouselComponent = () => {
       offset: screenWidth * index,
       index,
     }),
-    []
+    [],
   );
 
   return (
@@ -209,7 +210,9 @@ const CarouselComponent = () => {
               styles.dot,
               {
                 backgroundColor:
-                  index === currentIndex ? "#160d15" : "rgba(255, 255, 255, 0.214)",
+                  index === currentIndex
+                    ? "#160d15"
+                    : "rgba(255, 255, 255, 0.214)",
                 transform: [{ scale: index === currentIndex ? 1.2 : 1 }],
               },
             ]}
@@ -237,8 +240,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: screenWidth * 0.96,
-    height: CAROUSEL_HEIGHT * 0.85,
+    width: screenWidth,
+    height: CAROUSEL_HEIGHT,
   },
   indicatorContainer: {
     position: "absolute",
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
   dotsContainer: {
     flexDirection: "row",
     position: "absolute",
-    bottom: 36,
+    bottom: 16,
     alignSelf: "center",
     zIndex: 5,
   },
@@ -262,8 +265,8 @@ const styles = StyleSheet.create({
   },
   overlay: {
     backgroundColor: "rgba(0, 0, 0, 0.662)",
-    width: screenWidth * 0.96,
-    height: CAROUSEL_HEIGHT * 0.85,
+    width: screenWidth,
+    height: CAROUSEL_HEIGHT,
     zIndex: 9,
     position: "absolute",
     justifyContent: "center",

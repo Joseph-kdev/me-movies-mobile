@@ -1,6 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ApiResponse } from "../components/FilterComponent";
-import firestore, { addDoc, collection, getDocs, getFirestore, query, where } from "@react-native-firebase/firestore"
+import firestore, {
+  addDoc,
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "@react-native-firebase/firestore";
 import { User } from "@react-native-google-signin/google-signin";
 
 const TMDB_CONFIG = {
@@ -44,6 +51,21 @@ export const fetchMovies = async (query: string) => {
   return data.results;
 };
 
+export const getTopRated = async (type: string) => {
+  const response = await fetch(`${TMDB_CONFIG.BASE_URL}${type}/top_rated`, {
+    method: "GET",
+    headers: TMDB_CONFIG.headers,
+  });
+
+  if (!response.ok) {
+    console.log("Failed to fetch movies");
+    return [];
+  }
+
+  const data = await response.json();
+  return data.results;
+};
+
 export const fetchMovieDetails = async ({
   id,
   type,
@@ -73,7 +95,7 @@ export const fetchMovieDetails = async ({
 
 export const fetchTopRated = async ({ type }: { type: string }) => {
   const response = await fetch(
-    `${TMDB_CONFIG.BASE_URL}${type}/top_rated?api_key=${TMDB_CONFIG.API_KEY}`
+    `${TMDB_CONFIG.BASE_URL}${type}/top_rated?api_key=${TMDB_CONFIG.API_KEY}`,
   );
   if (!response.ok) {
     console.log("Error fetching top rated movies");
@@ -98,12 +120,12 @@ export const fetchByGenre = async ({
     `${TMDB_CONFIG.BASE_URL}/discover/${type}?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`,
     {
       headers: TMDB_CONFIG.headers,
-    }
+    },
   );
 
   if (!response.ok) {
     console.log("Error fetching this genre(s)");
-    throw new Error("Failed to fetch data")
+    throw new Error("Failed to fetch data");
   }
 
   const data = await response.json();
@@ -115,16 +137,16 @@ export const fetchByGenre = async ({
   };
 };
 
-export const userLists = async(listType: string, userId: string) => {
-  if(!userId) return 
-  const db = getFirestore()
-  const collectionRef = collection(db, `users/${userId}/${listType}`)
-  const snapshot = await getDocs(collectionRef)
+export const userLists = async (listType: string, userId: string) => {
+  if (!userId) return;
+  const db = getFirestore();
+  const collectionRef = collection(db, `users/${userId}/${listType}`);
+  const snapshot = await getDocs(collectionRef);
 
-  const retrievedData = snapshot.docs.map(doc => ({
+  const retrievedData = snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...doc.data()
-  }))
+    ...doc.data(),
+  }));
 
-  return retrievedData
-}
+  return retrievedData;
+};
