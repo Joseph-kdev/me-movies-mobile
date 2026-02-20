@@ -519,7 +519,14 @@ const TvDetails = () => {
                   />
                 </View>
               ) : errorSimilar ? (
-                <Text>An error occurred</Text>
+                <View className="flex-1">
+                  <Image
+                    source={require("../../assets/images/nothing.png")}
+                    resizeMode="contain"
+                    className="w-full h-[100px] rounded-md mt-2"
+                  />
+                  <Text className="text-text text-center mt-1 text-sm">Oops...An error occurred</Text>
+                </View>
               ) : (
                 <View>
                   <MovieList movies={similarShows ?? []} horizontal={true} />

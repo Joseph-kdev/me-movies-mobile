@@ -1,4 +1,4 @@
-import { Text, ActivityIndicator, ScrollView, View } from "react-native";
+import { Text, Image, ScrollView, View } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBar from "../components/SearchBar";
@@ -43,7 +43,16 @@ const SearchPage = () => {
           />
         </View>
       ) : isError ? (
-        <Text className="text-text">An error occurred</Text>
+        <View className="flex-1">
+          <Image
+            source={require("../../assets/images/sad.png")}
+            resizeMode="contain"
+            className="w-full h-[100px] rounded-md mt-2"
+          />
+          <Text className="text-text text-center mt-1 text-sm">
+            Oops...An error occurred
+          </Text>
+        </View>
       ) : (
         <ScrollView
           className="flex-1 px-4 py-2"

@@ -44,21 +44,21 @@ export default function Index() {
   const router = useRouter();
   return (
     <SafeAreaView className="bg-background flex-1">
+      <View className="absolute top-2 right-1 left-1 z-20 flex flex-row justify-between items-center">
+        <Image
+          source={require("../../assets/images/Me-Movies.png")}
+          resizeMode="cover"
+          className="w-[40px] h-[40px] rounded-md"
+        />
+        <Pressable className="" onPress={() => router.push("/(tabs)/search")}>
+          <Search size={20} color={"#a3dcbc"} className="" />
+        </Pressable>
+      </View>
       <ScrollView
         className="flex-1 px-2"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 60 }}
       >
-        <View className="absolute top-2 right-1 left-1 z-20 flex flex-row justify-between items-center">
-          <Image
-            source={require("../../assets/images/Me-Movies.png")}
-            resizeMode="cover"
-            className="w-[40px] h-[40px] rounded-md"
-          />
-          <Pressable className="" onPress={() => router.push("/(tabs)/search")}>
-            <Search size={20} color={"#a3dcbc"} className="" />
-          </Pressable>
-        </View>
         <CarouselComponent />
         <View className="mt-4">
           <Text className="text-text mb-1">Trending Today</Text>
@@ -72,7 +72,16 @@ export default function Index() {
               />
             </View>
           ) : errorTrending ? (
-            <Text>An error occurred</Text>
+            <View className="flex-1">
+              <Image
+                source={require("../../assets/images/sad.png")}
+                resizeMode="contain"
+                className="w-full h-[100px] rounded-md mt-2"
+              />
+              <Text className="text-text text-center mt-1 text-sm">
+                Oops...An error occurred
+              </Text>
+            </View>
           ) : (
             <View>
               <MovieList movies={trending} horizontal={true} />
@@ -91,9 +100,16 @@ export default function Index() {
               />
             </View>
           ) : errorTopMovies ? (
-            <Text className="text-red-500">
-              Failed to load top rated movies
-            </Text>
+            <View className="flex-1">
+              <Image
+                source={require("../../assets/images/sad.png")}
+                resizeMode="contain"
+                className="w-full h-[100px] rounded-md mt-2"
+              />
+              <Text className="text-text text-center mt-1 text-sm">
+                Oops...An error occurred
+              </Text>
+            </View>
           ) : (
             <MovieList movies={topRatedMovies ?? []} horizontal={true} />
           )}
@@ -111,7 +127,16 @@ export default function Index() {
               />
             </View>
           ) : errorTopShows ? (
-            <Text className="text-red-500">Failed to load top rated shows</Text>
+            <View className="flex-1">
+              <Image
+                source={require("../../assets/images/sad.png")}
+                resizeMode="contain"
+                className="w-full h-[100px] rounded-md mt-2"
+              />
+              <Text className="text-text text-center mt-1 text-sm">
+                Oops...An error occurred
+              </Text>
+            </View>
           ) : (
             <MovieList movies={topRatedShows ?? []} horizontal={true} />
           )}

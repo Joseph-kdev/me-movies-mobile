@@ -139,7 +139,7 @@ const Catalogue = () => {
                 <View className="flex-1 px-8">
                   <View className="flex justify-center items-center mt-4">
                     <Image
-                      source={require("../../assets/images/void.png")}
+                      source={require("../../assets/images/empty.png")}
                       resizeMode="cover"
                       className="w-[300px] h-[300px] rounded-md mt-2"
                     />
@@ -243,7 +243,7 @@ const Catalogue = () => {
               <View className="flex-1 px-8">
                 <View className="flex justify-center items-center mt-4">
                   <Image
-                    source={require("../../assets/images/no-data.png")}
+                    source={require("../../assets/images/empty.png")}
                     resizeMode="cover"
                     className="w-[300px] h-[300px] rounded-md mt-2"
                   />

@@ -163,8 +163,8 @@ export const getSimilarMovies = async (id: number | string, type: string): Promi
   );
 
   if (!response.ok) {
-    console.error(`Failed to fetch similar movies for ID ${id}:`, response.status);
-    return [];
+    console.log(`Failed to fetch similar movies for ID ${id}:`, response.status);
+    throw new Error("Error fetching similar")
   }
 
   const data = await response.json();

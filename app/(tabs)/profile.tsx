@@ -76,12 +76,12 @@ const Profile = () => {
 
   return (
     <ScrollView
-      className="flex-1 bg-white"
+      className="flex-1 bg-background"
       contentContainerClassName="pb-24"
       showsVerticalScrollIndicator={false}
     >
       {/* Header Section */}
-      <View className="items-center pt-12 pb-8 px-6 bg-white">
+      <View className="items-center pt-12 pb-8 px-6 ">
         <View className="relative mb-4">
           <Image
             source={
@@ -99,16 +99,16 @@ const Profile = () => {
           </View>
         </View>
 
-        <Text className="text-2xl font-bold text-gray-800 mb-1 text-center">
+        <Text className="text-2xl font-bold text-text mb-1 text-center">
           {user?.displayName || "Movie Buff"}
         </Text>
         <Text className="text-gray-500 text-sm mb-6 text-center">
           {user?.email || "No email provided"}
         </Text>
 
-        <TouchableOpacity className="bg-primary px-6 py-2 rounded-full">
+        {/* <TouchableOpacity className="bg-primary px-6 py-2 rounded-full">
           <Text className="text-white font-medium text-sm">Edit Profile</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Stats Section */}
@@ -117,7 +117,7 @@ const Profile = () => {
         <View className="w-[1px] bg-gray-200 h-full" />
         <StatItem label="Favorites" value="28" />
         <View className="w-[1px] bg-gray-200 h-full" />
-        <StatItem label="Reviews" value="15" />
+        <StatItem label="WatchList" value="15" />
       </View>
 
       {/* Menu Options */}
@@ -125,7 +125,6 @@ const Profile = () => {
         <Text className="text-gray-400 font-bold mb-2 text-xs uppercase tracking-widest">
           Account
         </Text>
-        <MenuOption icon={User} label="Personal Details" />
         <MenuOption icon={Bell} label="Notifications" />
         <MenuOption icon={Shield} label="Privacy & Security" />
 
