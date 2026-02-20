@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   CircleCheck,
   HeartIcon,
+  LogIn,
   Star,
   X,
 } from "lucide-react-native";
@@ -38,6 +39,7 @@ import {
 } from "@react-native-firebase/firestore";
 import LoaderKitView from "react-native-loader-kit";
 import MovieList from "../components/MovieList";
+import { toast } from "sonner-native";
 
 const TvDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -157,8 +159,13 @@ const TvDetails = () => {
     type: string,
   ) => {
     if (!user) {
-      console.log("No user was found");
-      return; // stop if not logged in
+      toast.error("Sign in to manage your collection", {
+        description: "Create an account to save movies & shows",
+        duration: 4000,
+        icon: <LogIn size={18} color="#ef4444" />,
+        style: { backgroundColor: '#2d0808' },
+      });
+      return;
     }
 
     try {
@@ -190,6 +197,19 @@ const TvDetails = () => {
             ...prevState,
             [listType]: true,
           }));
+          toast.success(`Added to ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
+            duration: 3000,
+            icon:
+              listType === "favorites" ? (
+                <HeartIcon size={18} fill="red" stroke="red" />
+              ) : (
+                <BookmarkPlus size={18} color="#22c55e" />
+              ),
+            style:
+              listType === "favorites"
+                ? { backgroundColor: '#2d1015' }
+                : { backgroundColor: '#0a1f14' },
+          });
         } else {
           console.log("Cannot remove non-existent show");
         }
@@ -197,7 +217,16 @@ const TvDetails = () => {
         // Show found, perform action based on 'add' or 'remove'
         const docRef = querySnapshot.docs[0].ref; // Get reference of the found document
         if (action === "add") {
-          console.log("Already saved");
+          toast(`Already in ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
+            duration: 2000,
+            icon:
+              listType === "favorites" ? (
+                <HeartIcon size={18} stroke="#9ca3af" />
+              ) : (
+                <BookmarkPlus size={18} stroke="#9ca3af" />
+              ),
+            style: { backgroundColor: '#222228' },
+          });
         } else if (action === "remove") {
           await deleteDoc(docRef);
 
@@ -205,6 +234,16 @@ const TvDetails = () => {
             ...prevState,
             [listType]: false,
           }));
+          toast.success(`Removed from ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
+            duration: 2500,
+            icon:
+              listType === "favorites" ? (
+                <HeartIcon size={18} stroke="#9ca3af" />
+              ) : (
+                <BookmarkMinus size={18} stroke="#9ca3af" />
+              ),
+            style: { backgroundColor: '#1a1a2e' },
+          });
         }
       }
     } catch (error) {
@@ -215,7 +254,11 @@ const TvDetails = () => {
   const moveToWatched = async (type: string) => {
     try {
       if (!user) {
-        console.log("Please login to modify collections.");
+        toast.error("Sign in to manage your collection", {
+          description: "Create an account to save movies & shows",
+          duration: 4000,
+          icon: <LogIn size={18} color="#ef4444" />,
+        });
         return;
       }
 
@@ -251,6 +294,12 @@ const TvDetails = () => {
         watched: true,
         watchlist: false,
       }));
+      toast.success("Marked as watched", {
+        description: "Great taste! Added to your watched list",
+        duration: 3000,
+        icon: <CircleCheck size={18} color="#22c55e" />,
+        style: { backgroundColor: '#0a1f14' },
+      });
     } catch (error) {
       console.log(error);
     }

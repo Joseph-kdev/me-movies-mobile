@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { useAuth } from "../AuthContext";
 import { Image } from "expo-image";
@@ -15,10 +15,27 @@ import {
 } from "lucide-react-native";
 import auth from "@react-native-firebase/auth";
 import { useRouter } from "expo-router";
+import { getUserStats, UserStats } from "../services/requests";
 
 const Profile = () => {
   const { user } = useAuth();
   const router = useRouter();
+
+  const [stats, setStats] = useState<UserStats>({
+    watched: 0,
+    favorites: 0,
+    watchlist: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    setStatsLoading(true);
+    getUserStats(user.uid)
+      .then(setStats)
+      .catch((err) => console.log("Failed to fetch user stats:", err))
+      .finally(() => setStatsLoading(false));
+  }, [user?.uid]);
 
   const handleSignOut = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
@@ -65,9 +82,19 @@ const Profile = () => {
     </TouchableOpacity>
   );
 
-  const StatItem = ({ label, value }: { label: string; value: string }) => (
+  const StatItem = ({
+    label,
+    value,
+    loading,
+  }: {
+    label: string;
+    value: number;
+    loading?: boolean;
+  }) => (
     <View className="items-center flex-1">
-      <Text className="text-primary text-xl font-bold mb-1">{value}</Text>
+      <Text className="text-primary text-xl font-bold mb-1">
+        {loading ? "-" : value}
+      </Text>
       <Text className="text-gray-500 text-xs uppercase tracking-wider">
         {label}
       </Text>
@@ -113,11 +140,11 @@ const Profile = () => {
 
       {/* Stats Section */}
       <View className="flex-row justify-between py-6 mx-6 bg-gray-50 rounded-2xl mb-8 px-4">
-        <StatItem label="Watched" value="142" />
+        <StatItem label="Watched" value={stats.watched} loading={statsLoading} />
         <View className="w-[1px] bg-gray-200 h-full" />
-        <StatItem label="Favorites" value="28" />
+        <StatItem label="Favorites" value={stats.favorites} loading={statsLoading} />
         <View className="w-[1px] bg-gray-200 h-full" />
-        <StatItem label="WatchList" value="15" />
+        <StatItem label="WatchList" value={stats.watchlist} loading={statsLoading} />
       </View>
 
       {/* Menu Options */}

@@ -151,6 +151,30 @@ export const userLists = async (listType: string, userId: string) => {
   return retrievedData;
 };
 
+export interface UserStats {
+  watched: number;
+  favorites: number;
+  watchlist: number;
+}
+
+export const getUserStats = async (userId: string): Promise<UserStats> => {
+  if (!userId) return { watched: 0, favorites: 0, watchlist: 0 };
+
+  const db = getFirestore();
+
+  const [watchedSnap, favoritesSnap, watchlistSnap] = await Promise.all([
+    getDocs(collection(db, `users/${userId}/watched`)),
+    getDocs(collection(db, `users/${userId}/favorites`)),
+    getDocs(collection(db, `users/${userId}/watchlist`)),
+  ]);
+
+  return {
+    watched: watchedSnap.size,
+    favorites: favoritesSnap.size,
+    watchlist: watchlistSnap.size,
+  };
+};
+
 export const getSimilarMovies = async (id: number | string, type: string): Promise<any[]> => {
   if (!id) return [];
 
