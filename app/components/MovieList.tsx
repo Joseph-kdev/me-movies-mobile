@@ -37,7 +37,7 @@ const MovieList = ({
       ) : (
         <FlatList
           data={movies}
-          maxToRenderPerBatch={8}
+          maxToRenderPerBatch={15}
           renderItem={({ item }) => (
             <MovieCard
               id={item.id}

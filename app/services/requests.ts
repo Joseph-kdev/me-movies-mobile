@@ -1,14 +1,9 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ApiResponse } from "../components/FilterComponent";
-import firestore, {
-  addDoc,
+import {
   collection,
   getDocs,
   getFirestore,
-  query,
-  where,
 } from "@react-native-firebase/firestore";
-import { User } from "@react-native-google-signin/google-signin";
 
 const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3/",
@@ -18,19 +13,6 @@ const TMDB_CONFIG = {
     Authorization: `Bearer ${process.env.EXPO_PUBLIC_MOVIE_KEY}`,
   },
 };
-
-// const cacheMovieDetails = async(movieId: number, data: any, type: string) => {
-//     try {
-//         await AsyncStorage.setItem(`${type}-${movieId}`, JSON.stringify(data))
-//     } catch (error) {
-//         console.log("Error occurred setting to asyncstorage", error)
-//     }
-// }
-
-// const getCachedMovieDetails = async(movieId: number, type: string) => {
-//     const data = await AsyncStorage.getItem(`${type}-${movieId}`)
-//     return data ? JSON.parse(data) : null
-// }
 
 export const fetchMovies = async (query: string) => {
   const endpoint = query
@@ -73,7 +55,7 @@ export const fetchMovieDetails = async ({
   id: number;
   type: string;
 }) => {
-  const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?api_key=${TMDB_CONFIG.API_KEY}&append_to_response=videos,credits`;
+  const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?append_to_response=videos,credits`;
 
   // const cached = await getCachedMovieDetails(id, type)
   // if (cached) return cached
@@ -95,7 +77,7 @@ export const fetchMovieDetails = async ({
 
 export const fetchTopRated = async ({ type }: { type: string }) => {
   const response = await fetch(
-    `${TMDB_CONFIG.BASE_URL}${type}/top_rated?api_key=${TMDB_CONFIG.API_KEY}`,
+    `${TMDB_CONFIG.BASE_URL}${type}/top_rated`,
   );
   if (!response.ok) {
     console.log("Error fetching top rated movies");
@@ -117,7 +99,7 @@ export const fetchByGenre = async ({
   const genresQuery = genre.length > 0 ? `&with_genres=${genre.join(",")}` : "";
 
   const response = await fetch(
-    `${TMDB_CONFIG.BASE_URL}/discover/${type}?api_key=${TMDB_CONFIG.API_KEY}&sort_by=popularity.desc${genresQuery}&page=${page}`,
+    `${TMDB_CONFIG.BASE_URL}/discover/${type}?sort_by=popularity.desc${genresQuery}&page=${page}`,
     {
       headers: TMDB_CONFIG.headers,
     },

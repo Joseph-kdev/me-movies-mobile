@@ -128,8 +128,8 @@ export default function Signup() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+    <SafeAreaView className="flex-1 bg-background relative">
+      <StatusBar className="bg-background" />
       <ScrollView contentContainerClassName="flex-grow justify-center px-5">
         <Pressable
           className="absolute top-4 left-4 z-50 bg-secondary/40 rounded-full flex justify-center p-1"

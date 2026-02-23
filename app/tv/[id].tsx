@@ -9,6 +9,7 @@ import {
   Platform,
   Pressable,
   Alert,
+  StatusBar,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -306,7 +307,8 @@ const TvDetails = () => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1 bg-background">
+      <StatusBar hidden={false}/>
       {isLoading && (
         <View className="min-h-screen bg-background flex justify-center items-center">
           <LoaderKitView
@@ -322,11 +324,10 @@ const TvDetails = () => {
         </View>
       )}
       {tvShow && (
-        <View className="min-h-screen bg-background">
           <ScrollView
-            className="flex-1"
+            className="flex-1 min-h-screen bg-background"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ minHeight: "100%", paddingBottom: 80 }}
+            contentContainerStyle={{ minHeight: "100%", paddingBottom: 16 }}
           >
             <View className="relative">
               <Pressable
@@ -435,7 +436,7 @@ const TvDetails = () => {
                   </View>
                 </View>
               </View>
-              <View className="flex flex-col gap-2">
+              <View className="flex flex-col gap-2 my-4">
                 {!tvInCollections.watched ? (
                   <View className="">
                     <Pressable
@@ -528,9 +529,9 @@ const TvDetails = () => {
                   className="mt-2 pb-2"
                 />
               </View>
-              <View className="mt-6">
+              <View className="mt-2">
                 <Text className="text-text text-lg">Trailer</Text>
-                <View className="max-w-full flex justify-center items-center mt-2">
+                <View className="max-w-full flex justify-center items-center mt-1">
                   {officialTrailer ? (
                     <YoutubeView
                       useInlineHtml={false}
@@ -555,8 +556,7 @@ const TvDetails = () => {
                   )}
                 </View>
               </View>
-            </View>
-            <View className="mt-6 px-2">
+            <View className="mt-4 px-1">
               <Text className="text-text mb-1">Similar Vibes</Text>
               {isLoadingSimilar ? (
                 <View className="flex flex-1 self-center justify-center items-center">
@@ -582,8 +582,8 @@ const TvDetails = () => {
                 </View>
               )}
             </View>
+            </View>
           </ScrollView>
-        </View>
       )}
     </SafeAreaView>
   );

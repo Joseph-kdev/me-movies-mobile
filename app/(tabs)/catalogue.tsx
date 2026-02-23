@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, Image, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AuthSplash from "../components/AuthSplash";
@@ -6,7 +6,6 @@ import { useAuth } from "../AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { userLists } from "../services/requests";
 import MovieList from "../components/MovieList";
-import { Image } from "react-native";
 
 const Catalogue = () => {
   const { user } = useAuth();
@@ -60,7 +59,7 @@ const Catalogue = () => {
           Library
         </Text>
       </View>
-      <View>{!user && <AuthSplash />}</View>
+      <View className="h-full flex justify-center items-center">{!user && <AuthSplash />}</View>
       {user && (
         <View className="flex flex-row mx-2 mb-[4px] bg-primary rounded-full">
           <Pressable
@@ -107,7 +106,7 @@ const Catalogue = () => {
           </Pressable>
         </View>
       )}
-      <View className="flex-1 bg-background min-h-screen px-2">
+      <ScrollView className="flex-1 bg-background min-h-screen px-2">
         {activeTab === "favorites" && (
           <>
             {isFavoritesLoading && (
@@ -262,7 +261,7 @@ const Catalogue = () => {
             )}
           </>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

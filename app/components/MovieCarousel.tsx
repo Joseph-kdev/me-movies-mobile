@@ -12,6 +12,7 @@ import {
 import { fetchMovieDetails } from "../services/requests";
 import { useQueries } from "@tanstack/react-query";
 import { Play, Star } from "lucide-react-native";
+import { useRouter } from "expo-router";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
 const CAROUSEL_HEIGHT = screenHeight * 0.5;
@@ -28,6 +29,8 @@ const CarouselComponent = () => {
   ];
 
   const editorsChoiceIds = [293660, 546554, 13, 372058, 157336, 359724, 872585];
+
+  const router = useRouter()
 
   const queries = editorsChoiceIds.map((movieId) => ({
     queryKey: ["movie", movieId],
@@ -147,7 +150,7 @@ const CarouselComponent = () => {
           <View></View>
         </View>
         <TouchableOpacity
-          className="absolute bottom-10 right-2 z-10 flex flex-row items-center bg-gray-800 p-1 rounded-md active:opacity-70"
+          className="absolute bottom-10 right-2 z-10 flex flex-row items-center bg-gray-800 p-4 rounded-md active:opacity-70"
           onPress={() =>
             router.push({ pathname: "/movies/[id]", params: { id: item.id } })
           }

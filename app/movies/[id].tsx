@@ -40,6 +40,7 @@ import {
 import LoaderKitView from "react-native-loader-kit";
 import MovieList from "../components/MovieList";
 import { toast } from "sonner-native";
+import { StatusBar } from "react-native";
 
 const MovieDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -163,7 +164,7 @@ const MovieDetails = () => {
         description: "Create an account to save movies & shows",
         duration: 4000,
         icon: <LogIn size={18} color="#ef4444" />,
-        style: { backgroundColor: '#2d0808' },
+        style: { backgroundColor: "#2d0808" },
       });
       return;
     }
@@ -197,19 +198,22 @@ const MovieDetails = () => {
             ...prevState,
             [listType]: true,
           }));
-          toast.success(`Added to ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
-            duration: 3000,
-            icon:
-              listType === "favorites" ? (
-                <HeartIcon size={18} fill="red" stroke="red" />
-              ) : (
-                <BookmarkPlus size={18} color="#22c55e" />
-              ),
-            style:
-              listType === "favorites"
-                ? { backgroundColor: '#2d1015' }
-                : { backgroundColor: '#0a1f14' },
-          });
+          toast.success(
+            `Added to ${listType.charAt(0).toUpperCase() + listType.slice(1)}`,
+            {
+              duration: 3000,
+              icon:
+                listType === "favorites" ? (
+                  <HeartIcon size={18} fill="red" stroke="red" />
+                ) : (
+                  <BookmarkPlus size={18} color="#22c55e" />
+                ),
+              style:
+                listType === "favorites"
+                  ? { backgroundColor: "#2d1015" }
+                  : { backgroundColor: "#0a1f14" },
+            },
+          );
         } else {
           console.log("Cannot remove non-existent movie");
         }
@@ -217,16 +221,19 @@ const MovieDetails = () => {
         // Movie found, perform action based on 'add' or 'remove'
         const docRef = querySnapshot.docs[0].ref; // Get reference of the found document
         if (action === "add") {
-          toast(`Already in ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
-            duration: 2000,
-            icon:
-              listType === "favorites" ? (
-                <HeartIcon size={18} stroke="#9ca3af" />
-              ) : (
-                <BookmarkPlus size={18} stroke="#9ca3af" />
-              ),
-            style: { backgroundColor: '#222228' },
-          });
+          toast(
+            `Already in ${listType.charAt(0).toUpperCase() + listType.slice(1)}`,
+            {
+              duration: 2000,
+              icon:
+                listType === "favorites" ? (
+                  <HeartIcon size={18} stroke="#9ca3af" />
+                ) : (
+                  <BookmarkPlus size={18} stroke="#9ca3af" />
+                ),
+              style: { backgroundColor: "#222228" },
+            },
+          );
         } else if (action === "remove") {
           await deleteDoc(docRef);
 
@@ -234,16 +241,19 @@ const MovieDetails = () => {
             ...prevState,
             [listType]: false,
           }));
-          toast.success(`Removed from ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
-            duration: 2500,
-            icon:
-              listType === "favorites" ? (
-                <HeartIcon size={18} stroke="#9ca3af" />
-              ) : (
-                <BookmarkMinus size={18} stroke="#9ca3af" />
-              ),
-            style: { backgroundColor: '#1a1a2e' },
-          });
+          toast.success(
+            `Removed from ${listType.charAt(0).toUpperCase() + listType.slice(1)}`,
+            {
+              duration: 2500,
+              icon:
+                listType === "favorites" ? (
+                  <HeartIcon size={18} stroke="#9ca3af" />
+                ) : (
+                  <BookmarkMinus size={18} stroke="#9ca3af" />
+                ),
+              style: { backgroundColor: "#1a1a2e" },
+            },
+          );
         }
       }
 
@@ -301,7 +311,7 @@ const MovieDetails = () => {
         description: "Great taste! Added to your watched list",
         duration: 3000,
         icon: <CircleCheck size={18} color="#22c55e" />,
-        style: { backgroundColor: '#0a1f14' },
+        style: { backgroundColor: "#0a1f14" },
       });
 
       // Invalidate the query to refetch data from Firestore
@@ -312,7 +322,8 @@ const MovieDetails = () => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1 bg-background">
+      <StatusBar hidden={false} />
       {isLoading && (
         <View className="min-h-screen bg-background flex justify-center items-center">
           <LoaderKitView
@@ -328,268 +339,264 @@ const MovieDetails = () => {
         </View>
       )}
       {movie && (
-        <View className="min-h-screen bg-background">
-          <ScrollView
-            className="flex-1"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ minHeight: "100%", paddingBottom: 60 }}
-          >
-            <View className="relative">
-              <Pressable
-                className="absolute top-4 left-2 z-50 bg-primary rounded-full flex justify-center p-1"
-                onPress={() => router.back()}
-              >
-                <ChevronLeft className="" />
-              </Pressable>
-              <LinearGradient
-                colors={["transparent", "#18181b", "#160d15"]}
-                className="absolute w-full h-[800px] z-10"
-              ></LinearGradient>
-              <Image
-                source={{
-                  uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`,
-                }}
-                className="w-full h-[550px] absolute"
-                resizeMode="cover"
-              />
-            </View>
-            <View className="mt-[400px] px-2 min-h-screen z-20">
-              <View className="flex flex-row justify-between items-center mb-1">
-                <Text className="text-2xl font-bold mt-2 text-text">
-                  {movie.title}
-                </Text>
-                <View className="mt-4">
-                  {movieInCollections.favorites ? (
-                    <Pressable
-                      onPress={() =>
-                        toggleMovieCollection("favorites", "remove", "movie")
-                      }
-                    >
-                      <HeartIcon
-                        className="w-4 h-4"
-                        stroke={"red"}
-                        fill={"red"}
-                      />
-                    </Pressable>
-                  ) : (
-                    <Pressable
-                      onPress={() =>
-                        toggleMovieCollection("favorites", "add", "movie")
-                      }
-                    >
-                      <HeartIcon className="w-5 h-5" stroke={"red"} />
-                    </Pressable>
-                  )}
-                </View>
-              </View>
-              <View>
-                <View className="flex flex-1 flex-row justify-between">
-                  <View className="flex flex-row gap-1 mt-2">
-                    {movie.genres.map(
-                      (genre: {
-                        id: React.Key | null | undefined;
-                        name:
-                          | string
-                          | number
-                          | bigint
-                          | boolean
-                          | React.ReactElement<
-                              unknown,
-                              string | React.JSXElementConstructor<any>
-                            >
-                          | Iterable<React.ReactNode>
-                          | React.ReactPortal
-                          | Promise<
-                              | string
-                              | number
-                              | bigint
-                              | boolean
-                              | React.ReactPortal
-                              | React.ReactElement<
-                                  unknown,
-                                  string | React.JSXElementConstructor<any>
-                                >
-                              | Iterable<React.ReactNode>
-                              | null
-                              | undefined
-                            >
-                          | null
-                          | undefined;
-                      }) => (
-                        <Text
-                          key={genre.id}
-                          className="text-text bg-secondary flex justify-center items-center px-2 py-1 text-xs rounded-full"
-                        >
-                          {genre.name}
-                        </Text>
-                      ),
-                    )}
-                  </View>
-                  <Text className="text-text mt-2">
-                    {movie.release_date.split("-")[0]}
-                  </Text>
-                </View>
-                <View className="flex-row gap-4 mt-2 justify-between">
-                  <Text className="text-text">{movie?.runtime} minutes</Text>
-                  <View className="flex-row items-center">
-                    <Star height={15} color={"gold"} fill={"gold"} />
-                    <Text className="text-text">
-                      {Math.round(parseFloat(movie.vote_average) * 10) / 10}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View className="flex flex-col gap-2">
-                {!movieInCollections.watched ? (
-                  <View className="">
-                    <Pressable
-                      onPress={() => moveToWatched("movie")}
-                      className="bg-gray-700 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
-                    >
-                      <View className="flex flex-row justify-center items-center gap-4">
-                        <CircleCheck className="" />
-                        <Text className="">Mark as Watched</Text>
-                      </View>
-                    </Pressable>
-                    <Pressable
-                      onPress={() =>
-                        toggleMovieCollection(
-                          "watchlist",
-                          movieInCollections.watchlist ? "remove" : "add",
-                          "movie",
-                        )
-                      }
-                      className="bg-accent px-2 py-1 flex justify-center items-center mt-2 rounded-full"
-                    >
-                      {movieInCollections.watchlist ? (
-                        <View className="w-full flex flex-row justify-center items-center gap-4">
-                          <BookmarkMinus className="" />
-                          <Text className="">Unadd from watchlist</Text>
-                        </View>
-                      ) : (
-                        <View className="w-full flex flex-row justify-center items-center gap-4">
-                          <BookmarkPlus className="" />
-                          <Text className="">Add to Watchlist</Text>
-                        </View>
-                      )}
-                    </Pressable>
-                  </View>
-                ) : (
-                  /* Watched – only show remove button */
+        <ScrollView
+          className="flex-1 min-h-screen bg-background"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ minHeight: "100%", paddingBottom: 16 }}
+        >
+          <View className="relative">
+            <Pressable
+              className="absolute top-4 left-2 z-50 bg-primary rounded-full flex justify-center p-1"
+              onPress={() => router.back()}
+            >
+              <ChevronLeft className="" />
+            </Pressable>
+            <LinearGradient
+              colors={["transparent", "#18181b", "#160d15"]}
+              className="absolute w-full h-[800px] z-10"
+            ></LinearGradient>
+            <Image
+              source={{
+                uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`,
+              }}
+              className="w-full h-[550px] absolute"
+              resizeMode="cover"
+            />
+          </View>
+          <View className="mt-[400px] px-2 min-h-screen z-20">
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text className="text-2xl font-bold mt-2 text-text">
+                {movie.title}
+              </Text>
+              <View className="mt-4">
+                {movieInCollections.favorites ? (
                   <Pressable
                     onPress={() =>
-                      toggleMovieCollection("watched", "remove", "movie")
+                      toggleMovieCollection("favorites", "remove", "movie")
                     }
-                    className="bg-gray-600 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
                   >
-                    <View className="flex flex-row justify-center items-center gap-2">
-                      <X />
-                      <Text className="">Remove from watched</Text>
-                    </View>
+                    <HeartIcon
+                      className="w-4 h-4"
+                      stroke={"red"}
+                      fill={"red"}
+                    />
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={() =>
+                      toggleMovieCollection("favorites", "add", "movie")
+                    }
+                  >
+                    <HeartIcon className="w-5 h-5" stroke={"red"} />
                   </Pressable>
                 )}
               </View>
-              <View className="mt-6">
-                <Text
-                  numberOfLines={isExpanded ? undefined : 4}
-                  onTextLayout={onTextLayout}
-                  className="text-text text-pretty"
-                >
-                  {movie.overview}
-                </Text>
-                {showReadMore && (
-                  <TouchableOpacity onPress={toggleExpanded} className="mt-2">
-                    <Text className="text-accent font-medium">
-                      {isExpanded ? "Read less" : "Read more"}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <View>
-                <Text className="mt-6 text-lg text-text">Top Cast</Text>
-                <FlatList
-                  data={movie.credits.cast}
-                  keyExtractor={(item) => item.id}
-                  horizontal
-                  maxToRenderPerBatch={4}
-                  ItemSeparatorComponent={() => <View className="w-2" />}
-                  renderItem={({ item }) => (
-                    <View className="flex flex-col items-center">
-                      <Image
-                        source={{
-                          uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
-                        }}
-                        className="rounded-full"
-                        resizeMode="cover"
-                        width={80}
-                        height={80}
-                      />
-                      <Text className="text-xs text-text mt-1">
-                        {item.name}
-                      </Text>
-                    </View>
-                  )}
-                  className="mt-2 pb-2"
-                />
-              </View>
-              <View className="mt-6">
-                <Text className="text-text text-lg">Trailer</Text>
-                <View className="max-w-full flex justify-center items-center mt-2">
-                  {officialTrailer ? (
-                    <YoutubeView
-                      useInlineHtml={false}
-                      player={player}
-                      height={Platform.OS === "web" ? "auto" : undefined}
-                      webViewProps={{
-                        renderToHardwareTextureAndroid: true,
-                      }}
-                      style={{
-                        minWidth: 344,
-                      }}
-                      iframeStyle={{
-                        aspectRatio: 16 / 9,
-                      }}
-                    />
-                  ) : (
-                    <ActivityIndicator
-                      size="large"
-                      color="white"
-                      style={{ alignSelf: "center" }}
-                    />
-                  )}
-                </View>
-              </View>
             </View>
-            <View className="mt-6 px-2">
-              <Text className="text-text mb-1">Similar Vibes</Text>
-              {isLoadingSimilar ? (
-                <View className="flex flex-1 self-center justify-center items-center">
-                  <LoaderKitView
-                    name="BallClipRotateMultiple"
-                    style={{ width: 50, height: 50 }}
-                    color={"#efe4ef"}
-                    className="mt-20"
-                  />
+            <View>
+              <View className="flex flex-1 flex-row justify-between">
+                <View className="flex flex-row gap-1 mt-2">
+                  {movie.genres.map(
+                    (genre: {
+                      id: React.Key | null | undefined;
+                      name:
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | React.ReactElement<
+                            unknown,
+                            string | React.JSXElementConstructor<any>
+                          >
+                        | Iterable<React.ReactNode>
+                        | React.ReactPortal
+                        | Promise<
+                            | string
+                            | number
+                            | bigint
+                            | boolean
+                            | React.ReactPortal
+                            | React.ReactElement<
+                                unknown,
+                                string | React.JSXElementConstructor<any>
+                              >
+                            | Iterable<React.ReactNode>
+                            | null
+                            | undefined
+                          >
+                        | null
+                        | undefined;
+                    }) => (
+                      <Text
+                        key={genre.id}
+                        className="text-text bg-secondary flex justify-center items-center px-2 py-1 text-xs rounded-full"
+                      >
+                        {genre.name}
+                      </Text>
+                    ),
+                  )}
                 </View>
-              ) : errorSimilar ? (
-                <View className="flex-1">
-                  <Image
-                    source={require("../../assets/images/nothing.png")}
-                    resizeMode="contain"
-                    className="w-full h-[100px] rounded-md mt-2"
-                  />
-                  <Text className="text-text text-center mt-1 text-sm">
-                    Oops...An error occurred
+                <Text className="text-text mt-2">
+                  {movie.release_date.split("-")[0]}
+                </Text>
+              </View>
+              <View className="flex-row gap-4 mt-2 justify-between">
+                <Text className="text-text">{movie?.runtime} minutes</Text>
+                <View className="flex-row items-center">
+                  <Star height={15} color={"gold"} fill={"gold"} />
+                  <Text className="text-text">
+                    {Math.round(parseFloat(movie.vote_average) * 10) / 10}
                   </Text>
                 </View>
-              ) : (
-                <View>
-                  <MovieList movies={similarMovies ?? []} horizontal={true} />
+              </View>
+            </View>
+            <View className="flex flex-col gap-2 my-4">
+              {!movieInCollections.watched ? (
+                <View className="">
+                  <Pressable
+                    onPress={() => moveToWatched("movie")}
+                    className="bg-gray-700 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
+                  >
+                    <View className="flex flex-row justify-center items-center gap-4">
+                      <CircleCheck className="" />
+                      <Text className="">Mark as Watched</Text>
+                    </View>
+                  </Pressable>
+                  <Pressable
+                    onPress={() =>
+                      toggleMovieCollection(
+                        "watchlist",
+                        movieInCollections.watchlist ? "remove" : "add",
+                        "movie",
+                      )
+                    }
+                    className="bg-accent px-2 py-1 flex justify-center items-center mt-2 rounded-full"
+                  >
+                    {movieInCollections.watchlist ? (
+                      <View className="w-full flex flex-row justify-center items-center gap-4">
+                        <BookmarkMinus className="" />
+                        <Text className="">Unadd from watchlist</Text>
+                      </View>
+                    ) : (
+                      <View className="w-full flex flex-row justify-center items-center gap-4">
+                        <BookmarkPlus className="" />
+                        <Text className="">Add to Watchlist</Text>
+                      </View>
+                    )}
+                  </Pressable>
                 </View>
+              ) : (
+                /* Watched – only show remove button */
+                <Pressable
+                  onPress={() =>
+                    toggleMovieCollection("watched", "remove", "movie")
+                  }
+                  className="bg-gray-600 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
+                >
+                  <View className="flex flex-row justify-center items-center gap-2">
+                    <X />
+                    <Text className="">Remove from watched</Text>
+                  </View>
+                </Pressable>
               )}
             </View>
-          </ScrollView>
-        </View>
+            <View className="mt-6">
+              <Text
+                numberOfLines={isExpanded ? undefined : 4}
+                onTextLayout={onTextLayout}
+                className="text-text text-pretty"
+              >
+                {movie.overview}
+              </Text>
+              {showReadMore && (
+                <TouchableOpacity onPress={toggleExpanded} className="mt-2">
+                  <Text className="text-accent font-medium">
+                    {isExpanded ? "Read less" : "Read more"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View>
+              <Text className="mt-6 text-lg text-text">Top Cast</Text>
+              <FlatList
+                data={movie.credits.cast}
+                keyExtractor={(item) => item.id}
+                horizontal
+                maxToRenderPerBatch={4}
+                ItemSeparatorComponent={() => <View className="w-2" />}
+                renderItem={({ item }) => (
+                  <View className="flex flex-col items-center">
+                    <Image
+                      source={{
+                        uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
+                      }}
+                      className="rounded-full"
+                      resizeMode="cover"
+                      width={80}
+                      height={80}
+                    />
+                    <Text className="text-xs text-text mt-1">{item.name}</Text>
+                  </View>
+                )}
+                className="mt-2 pb-2"
+              />
+            </View>
+            <View className="mt-2">
+              <Text className="text-text text-lg">Trailer</Text>
+              <View className="max-w-full flex justify-center items-center mt-1">
+                {officialTrailer ? (
+                  <YoutubeView
+                    useInlineHtml={false}
+                    player={player}
+                    height={Platform.OS === "web" ? "auto" : undefined}
+                    webViewProps={{
+                      renderToHardwareTextureAndroid: true,
+                    }}
+                    style={{
+                      minWidth: 344,
+                    }}
+                    iframeStyle={{
+                      aspectRatio: 16 / 9,
+                    }}
+                  />
+                ) : (
+                  <ActivityIndicator
+                    size="large"
+                    color="white"
+                    style={{ alignSelf: "center" }}
+                  />
+                )}
+              </View>
+            </View>
+          <View className="mt-4 px-1">
+            <Text className="text-text mb-1">Similar Vibes</Text>
+            {isLoadingSimilar ? (
+              <View className="flex flex-1 self-center justify-center items-center">
+                <LoaderKitView
+                  name="BallClipRotateMultiple"
+                  style={{ width: 50, height: 50 }}
+                  color={"#efe4ef"}
+                  className="mt-20"
+                />
+              </View>
+            ) : errorSimilar ? (
+              <View className="flex-1">
+                <Image
+                  source={require("../../assets/images/nothing.png")}
+                  resizeMode="contain"
+                  className="w-full h-[100px] rounded-md mt-2"
+                />
+                <Text className="text-text text-center mt-1 text-sm">
+                  Oops...An error occurred
+                </Text>
+              </View>
+            ) : (
+              <View>
+                <MovieList movies={similarMovies ?? []} horizontal={true} />
+              </View>
+            )}
+          </View>
+          </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );

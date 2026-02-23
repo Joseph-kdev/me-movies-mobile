@@ -1,4 +1,4 @@
-import { Text, View, ScrollView, Image, Pressable } from "react-native";
+import { Text, View, ScrollView, Image, Pressable, StatusBar } from "react-native";
 import CarouselComponent from "../components/MovieCarousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchMovies, getTopRated } from "../services/requests";
@@ -43,15 +43,16 @@ export default function Index() {
 
   const router = useRouter();
   return (
-    <SafeAreaView className="bg-background flex-1">
-      <View className="absolute top-2 right-1 left-1 z-20 flex flex-row justify-between items-center">
+    <View className="bg-background flex-1 relative">
+      <StatusBar hidden={true} />
+      <View className="absolute top-12 right-2 left-2 z-20 flex flex-row justify-between items-center">
         <Image
           source={require("../../assets/images/Me-Movies.png")}
           resizeMode="cover"
-          className="w-[40px] h-[40px] rounded-md"
+          className="w-[60px] h-[60px] rounded-md"
         />
         <Pressable className="" onPress={() => router.push("/(tabs)/search")}>
-          <Search size={20} color={"#a3dcbc"} className="" />
+          <Search size={30} color={"#a3dcbc"} className="" />
         </Pressable>
       </View>
       <ScrollView
@@ -142,6 +143,6 @@ export default function Index() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
