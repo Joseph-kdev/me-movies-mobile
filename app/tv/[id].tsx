@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchMovieDetails, getSimilarMovies } from "../services/requests";
 import {
   BookmarkMinus,
@@ -53,6 +53,7 @@ const TvDetails = () => {
     favorites: false,
   });
   const { user } = useAuth();
+  const queryClient = useQueryClient(); 
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -198,6 +199,8 @@ const TvDetails = () => {
             ...prevState,
             [listType]: true,
           }));
+          queryClient.invalidateQueries({ queryKey: [listType, user.uid] });
+          queryClient.invalidateQueries({ queryKey: ["userStats", user.uid] });
           toast.success(`Added to ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
             duration: 3000,
             icon:
@@ -235,6 +238,8 @@ const TvDetails = () => {
             ...prevState,
             [listType]: false,
           }));
+          queryClient.invalidateQueries({ queryKey: [listType, user.uid] });
+          queryClient.invalidateQueries({ queryKey: ["userStats", user.uid] });
           toast.success(`Removed from ${listType.charAt(0).toUpperCase() + listType.slice(1)}`, {
             duration: 2500,
             icon:
@@ -295,8 +300,11 @@ const TvDetails = () => {
         watched: true,
         watchlist: false,
       }));
+      queryClient.invalidateQueries({ queryKey: ["watched", user.uid] });
+      queryClient.invalidateQueries({ queryKey: ["watchlist", user.uid] });
+      queryClient.invalidateQueries({ queryKey: ["userStats", user.uid] });
       toast.success("Marked as watched", {
-        description: "Great taste! Added to your watched list",
+        description: "Hope you enjoyed it!",
         duration: 3000,
         icon: <CircleCheck size={18} color="#22c55e" />,
         style: { backgroundColor: '#0a1f14' },
@@ -327,7 +335,7 @@ const TvDetails = () => {
           <ScrollView
             className="flex-1 min-h-screen bg-background"
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ minHeight: "100%", paddingBottom: 16 }}
+            contentContainerStyle={{ minHeight: "100%", paddingBottom: 28 }}
           >
             <View className="relative">
               <Pressable
@@ -487,47 +495,73 @@ const TvDetails = () => {
                 )}
               </View>
               <View className="mt-6">
-                <Text
-                  numberOfLines={isExpanded ? undefined : 4}
-                  onTextLayout={onTextLayout}
-                  className="text-text text-pretty"
-                >
-                  {tvShow.overview}
-                </Text>
-                {showReadMore && (
-                  <TouchableOpacity onPress={toggleExpanded} className="mt-2">
-                    <Text className="text-accent font-medium">
-                      {isExpanded ? "Read less" : "Read more"}
+                {tvShow.overview ? (
+                  <>
+                    <Text
+                      numberOfLines={isExpanded ? undefined : 4}
+                      onTextLayout={onTextLayout}
+                      className="text-text text-pretty"
+                    >
+                      {tvShow.overview}
                     </Text>
-                  </TouchableOpacity>
+                    {showReadMore && (
+                      <TouchableOpacity onPress={toggleExpanded} className="mt-2">
+                        <Text className="text-accent font-medium">
+                          {isExpanded ? "Read less" : "Read more"}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                ) : (
+                  <View className="flex flex-col items-center justify-center mt-4 border border-secondary/50 rounded-xl p-4 bg-secondary/20">
+                    <Image source={require("../../assets/images/nothing.png")} className="w-[100px] h-[100px] opacity-80" resizeMode="contain" />
+                    <Text className="text-text/70 italic text-center mt-2">
+                      No overview available for this title.
+                    </Text>
+                  </View>
                 )}
               </View>
               <View>
                 <Text className="mt-6 text-lg text-text">Top Cast</Text>
-                <FlatList
-                  data={tvShow.credits.cast}
-                  keyExtractor={(item) => item.id}
-                  horizontal
-                  maxToRenderPerBatch={4}
-                  ItemSeparatorComponent={() => <View className="w-2" />}
-                  renderItem={({ item }) => (
-                    <View className="flex flex-col items-center">
-                      <Image
-                        source={{
-                          uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
-                        }}
-                        className="rounded-full"
-                        resizeMode="cover"
-                        width={80}
-                        height={80}
-                      />
-                      <Text className="text-xs text-text mt-1">
-                        {item.name}
-                      </Text>
-                    </View>
-                  )}
-                  className="mt-2 pb-2"
-                />
+                {tvShow.credits?.cast && tvShow.credits.cast.length > 0 ? (
+                  <FlatList
+                    data={tvShow.credits.cast}
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    maxToRenderPerBatch={4}
+                    ItemSeparatorComponent={() => <View className="w-2" />}
+                    renderItem={({ item }) => (
+                      <View className="flex flex-col items-center mx-1">
+                        {item.profile_path ? (
+                          <Image
+                            source={{
+                              uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
+                            }}
+                            className="rounded-full w-24 h-24"
+                            resizeMode="cover"
+                          />
+                        ) : (
+                          <Image
+                            source={require("../../assets/images/nothing.png")}
+                            className="rounded-full bg-secondary/50 w-24 h-24"
+                            resizeMode="cover"
+                          />
+                        )}
+                        <Text className="text-xs text-text mt-1 text-center w-[80px]" numberOfLines={2}>
+                          {item.name}
+                        </Text>
+                      </View>
+                    )}
+                    className="mt-2 pb-2"
+                  />
+                ) : (
+                  <View className="flex flex-col items-center justify-center mt-4 border border-secondary/50 rounded-xl p-4 bg-secondary/20">
+                    <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
+                    <Text className="text-text/70 italic text-center mt-2">
+                      Cast information is currently unavailable.
+                    </Text>
+                  </View>
+                )}
               </View>
               <View className="mt-2">
                 <Text className="text-text text-lg">Trailer</Text>

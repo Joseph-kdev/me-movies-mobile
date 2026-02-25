@@ -1,6 +1,6 @@
 // context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import auth, { FirebaseAuthTypes, getAuth } from '@react-native-firebase/auth';
+import { FirebaseAuthTypes, getAuth } from '@react-native-firebase/auth';
 
 type AuthContextType = {
   user: FirebaseAuthTypes.User | null;

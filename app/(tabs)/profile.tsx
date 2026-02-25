@@ -7,35 +7,27 @@ import {
   LogOut,
   ChevronRight,
   User,
-  Heart,
-  History,
   HelpCircle,
   Bell,
   Shield,
 } from "lucide-react-native";
 import auth from "@react-native-firebase/auth";
-import { useRouter } from "expo-router";
 import { getUserStats, UserStats } from "../services/requests";
+import { useQuery } from "@tanstack/react-query";
 
 const Profile = () => {
   const { user } = useAuth();
-  const router = useRouter();
 
-  const [stats, setStats] = useState<UserStats>({
-    watched: 0,
-    favorites: 0,
-    watchlist: 0,
+  const {data: stats, isLoading: statsLoading} = useQuery({
+    queryKey: ["userStats", user?.uid],
+    queryFn: () => getUserStats(user?.uid || ""),
+    enabled: !!user?.uid,
+    initialData: {
+      watched: 0,
+      favorites: 0,
+      watchlist: 0,
+    },
   });
-  const [statsLoading, setStatsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user?.uid) return;
-    setStatsLoading(true);
-    getUserStats(user.uid)
-      .then(setStats)
-      .catch((err) => console.log("Failed to fetch user stats:", err))
-      .finally(() => setStatsLoading(false));
-  }, [user?.uid]);
 
   const handleSignOut = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [

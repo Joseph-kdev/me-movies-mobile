@@ -197,6 +197,7 @@ export default function FilterComponent({ type }: { type: string }) {
       return undefined;
     },
     initialPageParam: 1,
+    staleTime: 3600000,
   });
 
   useEffect(() => {
@@ -274,7 +275,7 @@ export default function FilterComponent({ type }: { type: string }) {
               <ActivityIndicator
                 size="large"
                 color="white"
-                className="mt-10 self-center"
+                className="mt-4 self-center"
               />
             )}
 

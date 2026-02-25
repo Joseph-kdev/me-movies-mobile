@@ -49,10 +49,10 @@ export default function Index() {
         <Image
           source={require("../../assets/images/Me-Movies.png")}
           resizeMode="cover"
-          className="w-[60px] h-[60px] rounded-md"
+          className="w-[70px] h-[70px] rounded-lg"
         />
         <Pressable className="" onPress={() => router.push("/(tabs)/search")}>
-          <Search size={30} color={"#a3dcbc"} className="" />
+          <Search size={24} color={"#a3dcbc"} className="" />
         </Pressable>
       </View>
       <ScrollView

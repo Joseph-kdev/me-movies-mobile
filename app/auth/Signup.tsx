@@ -17,7 +17,7 @@ import {
   Alert,
   ActivityIndicator,
   Pressable,
-  Image
+  Image,
 } from "react-native";
 import {
   getAuth,
@@ -39,6 +39,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const auth = getAuth();
   const router = useRouter();
 
@@ -56,7 +57,7 @@ export default function Signup() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert("Signed in successfully!");
-      router.push("/(tabs)/catalogue")
+      router.push("/(tabs)/catalogue");
     } catch (error) {
       console.error("Sign in error:", error);
       alert(`Sign in failed: ${error.message}`);
@@ -70,7 +71,7 @@ export default function Signup() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Account created successfully!");
-      router.push("/(tabs)/catalogue")
+      router.push("/(tabs)/catalogue");
     } catch (error) {
       console.error("Sign up error:", error);
       alert(`Registration failed: ${error.message}`);
@@ -80,7 +81,7 @@ export default function Signup() {
   };
 
   async function onGoogleButtonPress() {
-    setLoading(true);
+    setGoogleLoading(true);
     try {
       // Check if your device supports Google Play
       await GoogleSignin.hasPlayServices({
@@ -101,7 +102,7 @@ export default function Signup() {
         // Sign in with Firebase
         await signInWithCredential(auth, googleCredential);
         console.log("Firebase authentication successful!");
-        router.push("/(tabs)/catalogue")
+        router.push("/(tabs)/catalogue");
       } else {
         alert("Google sign in cancelled");
       }
@@ -123,16 +124,16 @@ export default function Signup() {
         alert("An unexpected error occurred");
       }
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background relative">
+    <SafeAreaView className="flex-1 bg-background">
       <StatusBar className="bg-background" />
-      <ScrollView contentContainerClassName="flex-grow justify-center px-5">
+      <ScrollView contentContainerClassName="relative flex-1 justify-center px-5">
         <Pressable
-          className="absolute top-4 left-4 z-50 bg-secondary/40 rounded-full flex justify-center p-1"
+          className="absolute top-12 left-4 z-50 bg-secondary/40 rounded-full flex justify-center p-1"
           onPress={() => router.back()}
         >
           <ChevronLeft className="" stroke={"white"} />
@@ -140,11 +141,11 @@ export default function Signup() {
         <View className="bg-primary/80 rounded-3xl p-8 items-center shadow-lg">
           <View className="mb-8">
             <View className="w-20 h-20 justify-center items-center">
-                <Image
-                  source={require("../../assets/images/Me-Movies.png")}
-                  resizeMode="cover"
-                  className="w-[80px] h-[80px] rounded-md mt-6"
-                />
+              <Image
+                source={require("../../assets/images/Me-Movies.png")}
+                resizeMode="cover"
+                className="w-[80px] h-[80px] rounded-md mt-6"
+              />
             </View>
           </View>
 
@@ -214,11 +215,15 @@ export default function Signup() {
           <TouchableOpacity
             className="flex-row w-full bg-gray-400 py-3.5 rounded-full items-center justify-center mb-3"
             onPress={onGoogleButtonPress}
-            disabled={loading}
+            disabled={googleLoading}
           >
-            <Text className="ml-3 text-text text-base">
-              Sign in with Google
-            </Text>
+            {googleLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="ml-3 text-text text-base">
+                Sign in with Google
+              </Text>
+            )}
           </TouchableOpacity>
 
           {/* Bottom Link */}

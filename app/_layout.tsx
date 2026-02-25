@@ -15,11 +15,8 @@ export default function RootLayout() {
   const queryClient = new QueryClient();
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>();
-  const router = useRouter();
-  const segments = useSegments();
 
   const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
-    console.log("onAuthStateChanged", user);
     setUser(user);
     if (initializing) setInitializing(false);
   };
@@ -67,7 +64,7 @@ export default function RootLayout() {
               <Stack.Screen name="tv/[id]" options={{ headerShown: false }} />
               <Stack.Screen name="auth/Signup" options={{ headerShown: false }} />
             </Stack>
-            <Toaster theme="dark" />
+            <Toaster theme="dark" style={{ marginTop: 8}}/>
           </GestureHandlerRootView>
         </AuthProvider>
       </QueryClientProvider>

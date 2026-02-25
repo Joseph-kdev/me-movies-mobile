@@ -152,7 +152,7 @@ const CarouselComponent = () => {
         <TouchableOpacity
           className="absolute bottom-10 right-2 z-10 flex flex-row items-center bg-gray-800 p-4 rounded-md active:opacity-70"
           onPress={() =>
-            router.push({ pathname: "/movies/[id]", params: { id: item.id } })
+            router.push({ pathname: "/movies/[id]", params: { id: item.data.id } })
           }
         >
           <Play height={12} color="#a3dcbc" fill="#a3dcbc" />

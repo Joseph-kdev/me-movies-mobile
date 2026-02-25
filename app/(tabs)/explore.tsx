@@ -10,13 +10,13 @@ const Explore = () => {
     <SafeAreaView className="bg-background">
       <View>
         <Text
-          className="text-text text-center mt-6 mb-2"
+          className="text-text text-center mt-2 mb-2"
           style={{ fontFamily: "RubikDirt", fontSize: 32 }}
         >
           Explore
         </Text>
       </View>
-      <View className="flex flex-row mx-2 mb-[4px] bg-primary rounded-full">
+      <View className="flex flex-row mx-2 mb-[4px] bg-primary rounded-full p-1">
         <Pressable
           onPress={() => setActiveTab("movie")}
           className={`w-1/2 py-2 rounded-full ${

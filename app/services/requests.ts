@@ -4,6 +4,7 @@ import {
   getDocs,
   getFirestore,
 } from "@react-native-firebase/firestore";
+import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
 
 const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3/",
@@ -57,9 +58,6 @@ export const fetchMovieDetails = async ({
 }) => {
   const endpoint = `${TMDB_CONFIG.BASE_URL}${type}/${id}?append_to_response=videos,credits`;
 
-  // const cached = await getCachedMovieDetails(id, type)
-  // if (cached) return cached
-
   const response = await fetch(endpoint, {
     method: "GET",
     headers: TMDB_CONFIG.headers,
@@ -71,7 +69,6 @@ export const fetchMovieDetails = async ({
   }
 
   const data = await response.json();
-  // await cacheMovieDetails(id, data, type)
   return data;
 };
 
@@ -176,3 +173,17 @@ export const getSimilarMovies = async (id: number | string, type: string): Promi
   const data = await response.json();
   return data.results || [];
 };
+
+export const checkInternetConnectivity = async(): Promise<boolean> => {
+  try {
+    const networkState = await NetInfo.fetch()
+
+    if(!networkState.isConnected) {
+      return false
+    }
+
+    return true
+  } catch (error) {
+    return false
+  }
+}

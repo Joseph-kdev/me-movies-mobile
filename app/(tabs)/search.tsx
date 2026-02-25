@@ -26,7 +26,7 @@ const SearchPage = () => {
     <SafeAreaView className="flex-1 bg-background">
       <View>
         <Text
-          className="text-text text-center mt-6 mb-2"
+          className="text-text text-center mt-2 mb-2"
           style={{ fontFamily: "RubikDirt", fontSize: 32 }}
         >
           Search
