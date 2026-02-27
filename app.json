@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MeMovies",
-    "slug": "MeMovies",
+    "slug": "me-movies-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/Me-Movies.png",

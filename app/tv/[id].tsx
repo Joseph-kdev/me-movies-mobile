@@ -1,12 +1,10 @@
 import {
   View,
   Text,
-  ActivityIndicator,
   ScrollView,
   Image,
   TouchableOpacity,
   FlatList,
-  Platform,
   Pressable,
   Alert,
   StatusBar,
@@ -27,7 +25,6 @@ import {
   X,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { YoutubeView, useYouTubePlayer } from "react-native-youtube-bridge";
 import { useAuth } from "../AuthContext";
 import {
   addDoc,
@@ -41,6 +38,7 @@ import {
 import LoaderKitView from "react-native-loader-kit";
 import MovieList from "../components/MovieList";
 import { toast } from "sonner-native";
+import TrailerSection from "../components/TrailerSection";
 
 const TvDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -53,7 +51,7 @@ const TvDetails = () => {
     favorites: false,
   });
   const { user } = useAuth();
-  const queryClient = useQueryClient(); 
+  const queryClient = useQueryClient();
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -86,26 +84,29 @@ const TvDetails = () => {
     gcTime: 1000 * 60 * 60, // keep in cache 1 hour
   });
 
-  let officialTrailer = null;
+  const getPreferredTrailer = (videos: { results: Array<{ type: string; key: string; official?: boolean; name?: string }> } | undefined) => {
+    if (!videos?.results?.length) return null;
 
-  if (tvShow) {
-    officialTrailer = tvShow
-      ? tvShow.videos.results.find(
-          (trailer: { type: string }) => trailer.type === "Trailer",
-        )
-        ? tvShow.videos.results.find(
-            (trailer: { type: string }) => trailer.type === "Trailer",
-          )
-        : tvShow.videos.results[0]
-      : null;
-  }
-  const player = useYouTubePlayer(tvShow ? officialTrailer.key : "", {
-    autoplay: false,
-    controls: true,
-    playsinline: true,
-    rel: false,
-    muted: true,
-  });
+    const results = videos.results;
+
+    // 1. Official trailer (most reliable when present)
+    let trailer = results.find(v => v.type === "Trailer" && v.official === true);
+    if (trailer) return trailer;
+
+    // 2. Any trailer (most common fallback)
+    trailer = results.find(v => v.type === "Trailer");
+    if (trailer) return trailer;
+
+    // 3. First YouTube clip (very last resort — could be featurette, teaser, etc.)
+    trailer = results.find(v => v.site === "YouTube"); // or just take results[0]
+    if (trailer) return trailer;
+
+    return null;
+  };
+
+  const officialTrailer = tvShow ? getPreferredTrailer(tvShow.videos) : null;
+
+  const trailerKey = officialTrailer?.key ?? "";
 
   useEffect(() => {
     const fetchTvCollections = async () => {
@@ -316,7 +317,7 @@ const TvDetails = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <StatusBar hidden={false}/>
+      <StatusBar hidden={false} />
       {isLoading && (
         <View className="min-h-screen bg-background flex justify-center items-center">
           <LoaderKitView
@@ -332,264 +333,261 @@ const TvDetails = () => {
         </View>
       )}
       {tvShow && (
-          <ScrollView
-            className="flex-1 min-h-screen bg-background"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ minHeight: "100%", paddingBottom: 28 }}
-          >
-            <View className="relative">
-              <Pressable
-                className="absolute top-4 left-2 z-50 bg-primary p-1 rounded-full flex justify-center"
-                onPress={() => router.back()}
-              >
-                <ChevronLeft />
-              </Pressable>
-              <LinearGradient
-                colors={["transparent", "#18181b", "#160d15"]}
-                className="absolute w-full h-[800px] z-10"
-              ></LinearGradient>
-              <Image
-                source={{
-                  uri: `https://image.tmdb.org/t/p/w500${tvShow?.poster_path}`,
-                }}
-                className="w-full h-[550px] absolute"
-                resizeMode="cover"
-              />
-            </View>
-            <View className="mt-[400px] px-2 min-h-screen z-20">
-              <View className="flex flex-row justify-between items-center mb-1">
-                <Text className="text-2xl font-bold mt-2 text-text">
-                  {tvShow.title || tvShow.name}
-                </Text>
-                <View className="mt-4">
-                  {tvInCollections.favorites ? (
-                    <Pressable
-                      onPress={() =>
-                        toggleTvCollection("favorites", "remove", "tv")
-                      }
-                    >
-                      <HeartIcon
-                        className="w-4 h-4"
-                        stroke={"red"}
-                        fill={"red"}
-                      />
-                    </Pressable>
-                  ) : (
-                    <Pressable
-                      onPress={() =>
-                        toggleTvCollection("favorites", "add", "tv")
-                      }
-                    >
-                      <HeartIcon className="w-5 h-5" stroke={"red"} />
-                    </Pressable>
-                  )}
-                </View>
-              </View>
-              <View>
-                <View className="flex flex-1 flex-row justify-between">
-                  <View className="flex flex-row gap-1 mt-2">
-                    {tvShow.genres.map(
-                      (genre: {
-                        id: React.Key | null | undefined;
-                        name:
-                          | string
-                          | number
-                          | bigint
-                          | boolean
-                          | React.ReactElement<
-                              unknown,
-                              string | React.JSXElementConstructor<any>
-                            >
-                          | Iterable<React.ReactNode>
-                          | React.ReactPortal
-                          | Promise<
-                              | string
-                              | number
-                              | bigint
-                              | boolean
-                              | React.ReactPortal
-                              | React.ReactElement<
-                                  unknown,
-                                  string | React.JSXElementConstructor<any>
-                                >
-                              | Iterable<React.ReactNode>
-                              | null
-                              | undefined
-                            >
-                          | null
-                          | undefined;
-                      }) => (
-                        <Text
-                          key={genre.id}
-                          className="text-text bg-secondary flex justify-center items-center px-2 py-1 text-xs rounded-full"
-                        >
-                          {genre.name}
-                        </Text>
-                      ),
-                    )}
-                  </View>
-                  <Text className="text-text mt-2">
-                    {tvShow?.first_air_date.split("-")[0]}
-                  </Text>
-                </View>
-                <View className="flex-row gap-4 mt-2 justify-between">
-                  <Text className="text-text">
-                    {tvShow?.number_of_seasons} season(s)
-                  </Text>
-                  <View className="flex-row items-center">
-                    <Star height={15} color={"gold"} fill={"gold"} />
-                    <Text className="text-text">
-                      {Math.round(parseFloat(tvShow.vote_average) * 10) / 10}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View className="flex flex-col gap-2 my-4">
-                {!tvInCollections.watched ? (
-                  <View className="">
-                    <Pressable
-                      onPress={() => moveToWatched("tv")}
-                      className="bg-gray-700 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
-                    >
-                      <View className="flex flex-row justify-center items-center gap-4">
-                        <CircleCheck className="" />
-                        <Text className="">Mark as Watched</Text>
-                      </View>
-                    </Pressable>
-                    <Pressable
-                      onPress={() =>
-                        toggleTvCollection(
-                          "watchlist",
-                          tvInCollections.watchlist ? "remove" : "add",
-                          "tv",
-                        )
-                      }
-                      className="bg-accent px-2 py-1 flex justify-center items-center mt-2 rounded-full"
-                    >
-                      {tvInCollections.watchlist ? (
-                        <View className="w-full flex flex-row justify-center items-center gap-4">
-                          <BookmarkMinus className="" />
-                          <Text className="">Unadd from watchlist</Text>
-                        </View>
-                      ) : (
-                        <View className="w-full flex flex-row justify-center items-center gap-4">
-                          <BookmarkPlus className="" />
-                          <Text className="">Add to Watchlist</Text>
-                        </View>
-                      )}
-                    </Pressable>
-                  </View>
-                ) : (
-                  /* Watched – only show remove button */
+        <ScrollView
+          className="flex-1 min-h-screen bg-background"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ minHeight: "100%", paddingBottom: 28 }}
+        >
+          <View className="relative">
+            <Pressable
+              className="absolute top-4 left-2 z-50 bg-primary p-1 rounded-full flex justify-center"
+              onPress={() => router.back()}
+            >
+              <ChevronLeft />
+            </Pressable>
+            <LinearGradient
+              colors={["transparent", "#18181b", "#160d15"]}
+              className="absolute w-full h-[800px] z-10"
+            ></LinearGradient>
+            <Image
+              source={{
+                uri: `https://image.tmdb.org/t/p/w500${tvShow?.poster_path}`,
+              }}
+              className="w-full h-[550px] absolute"
+              resizeMode="cover"
+            />
+          </View>
+          <View className="mt-[400px] px-2 min-h-screen z-20">
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text className="text-2xl font-bold mt-2 text-text">
+                {tvShow.title || tvShow.name}
+              </Text>
+              <View className="mt-4">
+                {tvInCollections.favorites ? (
                   <Pressable
                     onPress={() =>
-                      toggleTvCollection("watched", "remove", "tv")
+                      toggleTvCollection("favorites", "remove", "tv")
                     }
-                    className="bg-gray-600 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
                   >
-                    <View className="flex flex-row justify-center items-center gap-2">
-                      <X />
-                      <Text className="">Remove from watched</Text>
-                    </View>
+                    <HeartIcon
+                      className="w-4 h-4"
+                      stroke={"red"}
+                      fill={"red"}
+                    />
+                  </Pressable>
+                ) : (
+                  <Pressable
+                    onPress={() =>
+                      toggleTvCollection("favorites", "add", "tv")
+                    }
+                  >
+                    <HeartIcon className="w-5 h-5" stroke={"red"} />
                   </Pressable>
                 )}
               </View>
-              <View className="mt-6">
-                {tvShow.overview ? (
-                  <>
-                    <Text
-                      numberOfLines={isExpanded ? undefined : 4}
-                      onTextLayout={onTextLayout}
-                      className="text-text text-pretty"
-                    >
-                      {tvShow.overview}
-                    </Text>
-                    {showReadMore && (
-                      <TouchableOpacity onPress={toggleExpanded} className="mt-2">
-                        <Text className="text-accent font-medium">
-                          {isExpanded ? "Read less" : "Read more"}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  </>
-                ) : (
-                  <View className="flex flex-col items-center justify-center mt-4 border border-secondary/50 rounded-xl p-4 bg-secondary/20">
-                    <Image source={require("../../assets/images/nothing.png")} className="w-[100px] h-[100px] opacity-80" resizeMode="contain" />
-                    <Text className="text-text/70 italic text-center mt-2">
-                      No overview available for this title.
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View>
-                <Text className="mt-6 text-lg text-text">Top Cast</Text>
-                {tvShow.credits?.cast && tvShow.credits.cast.length > 0 ? (
-                  <FlatList
-                    data={tvShow.credits.cast}
-                    keyExtractor={(item) => item.id}
-                    horizontal
-                    maxToRenderPerBatch={4}
-                    ItemSeparatorComponent={() => <View className="w-2" />}
-                    renderItem={({ item }) => (
-                      <View className="flex flex-col items-center mx-1">
-                        {item.profile_path ? (
-                          <Image
-                            source={{
-                              uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
-                            }}
-                            className="rounded-full w-24 h-24"
-                            resizeMode="cover"
-                          />
-                        ) : (
-                          <Image
-                            source={require("../../assets/images/nothing.png")}
-                            className="rounded-full bg-secondary/50 w-24 h-24"
-                            resizeMode="cover"
-                          />
-                        )}
-                        <Text className="text-xs text-text mt-1 text-center w-[80px]" numberOfLines={2}>
-                          {item.name}
-                        </Text>
-                      </View>
-                    )}
-                    className="mt-2 pb-2"
-                  />
-                ) : (
-                  <View className="flex flex-col items-center justify-center mt-4 border border-secondary/50 rounded-xl p-4 bg-secondary/20">
-                    <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
-                    <Text className="text-text/70 italic text-center mt-2">
-                      Cast information is currently unavailable.
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View className="mt-2">
-                <Text className="text-text text-lg">Trailer</Text>
-                <View className="max-w-full flex justify-center items-center mt-1">
-                  {officialTrailer ? (
-                    <YoutubeView
-                      useInlineHtml={false}
-                      player={player}
-                      height={Platform.OS === "web" ? "auto" : undefined}
-                      webViewProps={{
-                        renderToHardwareTextureAndroid: true,
-                      }}
-                      style={{
-                        minWidth: 344,
-                      }}
-                      iframeStyle={{
-                        aspectRatio: 16 / 9,
-                      }}
-                    />
-                  ) : (
-                    <ActivityIndicator
-                      size="large"
-                      color="white"
-                      style={{ alignSelf: "center" }}
-                    />
+            </View>
+            <View>
+              <View className="flex flex-1 flex-row justify-between">
+                <View className="flex flex-row gap-1 mt-2">
+                  {tvShow.genres.map(
+                    (genre: {
+                      id: React.Key | null | undefined;
+                      name:
+                      | string
+                      | number
+                      | bigint
+                      | boolean
+                      | React.ReactElement<
+                        unknown,
+                        string | React.JSXElementConstructor<any>
+                      >
+                      | Iterable<React.ReactNode>
+                      | React.ReactPortal
+                      | Promise<
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | React.ReactPortal
+                        | React.ReactElement<
+                          unknown,
+                          string | React.JSXElementConstructor<any>
+                        >
+                        | Iterable<React.ReactNode>
+                        | null
+                        | undefined
+                      >
+                      | null
+                      | undefined;
+                    }) => (
+                      <Text
+                        key={genre.id}
+                        className="text-text bg-secondary flex justify-center items-center px-2 py-1 text-xs rounded-full"
+                      >
+                        {genre.name}
+                      </Text>
+                    ),
                   )}
                 </View>
+                <Text className="text-text mt-2">
+                  {tvShow?.first_air_date.split("-")[0]}
+                </Text>
               </View>
+              <View className="flex-row gap-4 mt-2 justify-between">
+                <Text className="text-text">
+                  {tvShow?.number_of_seasons} season(s)
+                </Text>
+                <View className="flex-row items-center">
+                  <Star height={15} color={"gold"} fill={"gold"} />
+                  <Text className="text-text">
+                    {Math.round(parseFloat(tvShow.vote_average) * 10) / 10}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View className="flex flex-col gap-2 my-4">
+              {!tvInCollections.watched ? (
+                <View className="">
+                  <Pressable
+                    onPress={() => moveToWatched("tv")}
+                    className="bg-gray-700 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
+                  >
+                    <View className="flex flex-row justify-center items-center gap-4">
+                      <CircleCheck className="" />
+                      <Text className="">Mark as Watched</Text>
+                    </View>
+                  </Pressable>
+                  <Pressable
+                    onPress={() =>
+                      toggleTvCollection(
+                        "watchlist",
+                        tvInCollections.watchlist ? "remove" : "add",
+                        "tv",
+                      )
+                    }
+                    className="bg-accent px-2 py-1 flex justify-center items-center mt-2 rounded-full"
+                  >
+                    {tvInCollections.watchlist ? (
+                      <View className="w-full flex flex-row justify-center items-center gap-4">
+                        <BookmarkMinus className="" />
+                        <Text className="">Unadd from watchlist</Text>
+                      </View>
+                    ) : (
+                      <View className="w-full flex flex-row justify-center items-center gap-4">
+                        <BookmarkPlus className="" />
+                        <Text className="">Add to Watchlist</Text>
+                      </View>
+                    )}
+                  </Pressable>
+                </View>
+              ) : (
+                /* Watched – only show remove button */
+                <Pressable
+                  onPress={() =>
+                    toggleTvCollection("watched", "remove", "tv")
+                  }
+                  className="bg-gray-600 px-2 py-1 flex justify-center items-center mt-2 rounded-full"
+                >
+                  <View className="flex flex-row justify-center items-center gap-2">
+                    <X />
+                    <Text className="">Remove from watched</Text>
+                  </View>
+                </Pressable>
+              )}
+            </View>
+            <View className="mt-6">
+              {tvShow.overview ? (
+                <>
+                  <Text
+                    numberOfLines={isExpanded ? undefined : 4}
+                    onTextLayout={onTextLayout}
+                    className="text-text text-pretty"
+                  >
+                    {tvShow.overview}
+                  </Text>
+                  {showReadMore && (
+                    <TouchableOpacity onPress={toggleExpanded} className="mt-2">
+                      <Text className="text-accent font-medium">
+                        {isExpanded ? "Read less" : "Read more"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              ) : (
+                <View className="flex flex-col items-center justify-center mt-4 border border-secondary/50 rounded-xl p-4 bg-secondary/20">
+                  <Image source={require("../../assets/images/nothing.png")} className="w-[100px] h-[100px] opacity-80" resizeMode="contain" />
+                  <Text className="text-text/70 italic text-center mt-2">
+                    No overview available for this title.
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View>
+              <Text className="mt-6 text-lg text-text">Top Cast</Text>
+              {tvShow.credits?.cast && tvShow.credits.cast.length > 0 ? (
+                <FlatList
+                  data={tvShow.credits.cast}
+                  keyExtractor={(item) => item.id}
+                  horizontal
+                  maxToRenderPerBatch={4}
+                  ItemSeparatorComponent={() => <View className="w-2" />}
+                  renderItem={({ item }) => (
+                    <View className="flex flex-col items-center mx-1">
+                      {item.profile_path ? (
+                        <Image
+                          source={{
+                            uri: `https://image.tmdb.org/t/p/w500${item.profile_path}`,
+                          }}
+                          className="rounded-full w-24 h-24"
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <Image
+                          source={require("../../assets/images/nothing.png")}
+                          className="rounded-full bg-secondary/50 w-24 h-24"
+                          resizeMode="cover"
+                        />
+                      )}
+                      <Text className="text-xs text-text mt-1 text-center w-[80px]" numberOfLines={2}>
+                        {item.name}
+                      </Text>
+                    </View>
+                  )}
+                  className="mt-2 pb-2"
+                />
+              ) : (
+                <View className="flex flex-col items-center justify-center mt-4 border border-secondary/50 rounded-xl p-4 bg-secondary/20">
+                  <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
+                  <Text className="text-text/70 italic text-center mt-2">
+                    Cast information is currently unavailable.
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View className="mt-2">
+              <Text className="text-text text-lg">Trailer</Text>
+              <View className="max-w-full flex justify-center items-center mt-1">
+                {trailerKey ? (
+                  <TrailerSection videoKey={trailerKey}/>
+                ) : officialTrailer === null && tvShow?.videos?.results?.length > 0 ? (
+                  // Edge case: videos exist, but none are suitable (rare)
+                  <View className="w-full aspect-video bg-gray-900/50 rounded-xl justify-center items-center">
+                    <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
+                    <Text className="text-gray-400 text-center px-6">
+                      No playable trailer available
+                    </Text>
+                  </View>
+                ) : (
+                  // No videos at all → clean empty state
+                  <View className="w-full aspect-video bg-gray-900/50 rounded-xl justify-center items-center">
+                    <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
+                    <Text className="text-gray-400 text-center px-6">
+                      Trailer not available
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
             <View className="mt-4 px-1">
               <Text className="text-text mb-1">Similar Vibes</Text>
               {isLoadingSimilar ? (
@@ -616,8 +614,8 @@ const TvDetails = () => {
                 </View>
               )}
             </View>
-            </View>
-          </ScrollView>
+          </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );

@@ -10,6 +10,7 @@ import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { AuthProvider } from "./AuthContext";
+import OfflineNotice from "./components/OfflineNotice";
 
 export default function RootLayout() {
   const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar hidden={true} />
+      <OfflineNotice />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <GestureHandlerRootView>

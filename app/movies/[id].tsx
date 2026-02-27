@@ -1,14 +1,13 @@
 import {
   View,
   Text,
-  ActivityIndicator,
   ScrollView,
   Image,
   TouchableOpacity,
   FlatList,
-  Platform,
   Pressable,
   Alert,
+  StatusBar
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,7 +25,6 @@ import {
   X,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { YoutubeView, useYouTubePlayer } from "react-native-youtube-bridge";
 import { useAuth } from "../AuthContext";
 import {
   addDoc,
@@ -40,7 +38,7 @@ import {
 import LoaderKitView from "react-native-loader-kit";
 import MovieList from "../components/MovieList";
 import { toast } from "sonner-native";
-import { StatusBar } from "react-native";
+import TrailerSection from "../components/TrailerSection";
 
 const MovieDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -86,26 +84,29 @@ const MovieDetails = () => {
     gcTime: 1000 * 60 * 60, // keep in cache 1 hour
   });
 
-  let officialTrailer = null;
+  const getPreferredTrailer = (videos: { results: Array<{ type: string; key: string; official?: boolean; name?: string }> } | undefined) => {
+    if (!videos?.results?.length) return null;
 
-  if (movie) {
-    officialTrailer = movie
-      ? movie.videos.results.find(
-          (trailer: { type: string }) => trailer.type === "Trailer",
-        )
-        ? movie.videos.results.find(
-            (trailer: { type: string }) => trailer.type === "Trailer",
-          )
-        : movie.videos.results[0]
-      : null;
-  }
-  const player = useYouTubePlayer(movie ? officialTrailer.key : "", {
-    autoplay: false,
-    controls: true,
-    playsinline: true,
-    rel: false,
-    muted: true,
-  });
+    const results = videos.results;
+
+    // 1. Official trailer (most reliable when present)
+    let trailer = results.find(v => v.type === "Trailer" && v.official === true);
+    if (trailer) return trailer;
+
+    // 2. Any trailer (most common fallback)
+    trailer = results.find(v => v.type === "Trailer");
+    if (trailer) return trailer;
+
+    // 3. First YouTube clip (very last resort — could be featurette, teaser, etc.)
+    trailer = results.find(v => v.site === "YouTube"); // or just take results[0]
+    if (trailer) return trailer;
+
+    return null;
+  };
+
+  const officialTrailer = movie ? getPreferredTrailer(movie.videos) : null;
+
+  const trailerKey = officialTrailer?.key ?? null;
 
   useEffect(() => {
     const fetchMovieCollections = async () => {
@@ -404,32 +405,32 @@ const MovieDetails = () => {
                     (genre: {
                       id: React.Key | null | undefined;
                       name:
+                      | string
+                      | number
+                      | bigint
+                      | boolean
+                      | React.ReactElement<
+                        unknown,
+                        string | React.JSXElementConstructor<any>
+                      >
+                      | Iterable<React.ReactNode>
+                      | React.ReactPortal
+                      | Promise<
                         | string
                         | number
                         | bigint
                         | boolean
-                        | React.ReactElement<
-                            unknown,
-                            string | React.JSXElementConstructor<any>
-                          >
-                        | Iterable<React.ReactNode>
                         | React.ReactPortal
-                        | Promise<
-                            | string
-                            | number
-                            | bigint
-                            | boolean
-                            | React.ReactPortal
-                            | React.ReactElement<
-                                unknown,
-                                string | React.JSXElementConstructor<any>
-                              >
-                            | Iterable<React.ReactNode>
-                            | null
-                            | undefined
-                          >
+                        | React.ReactElement<
+                          unknown,
+                          string | React.JSXElementConstructor<any>
+                        >
+                        | Iterable<React.ReactNode>
                         | null
-                        | undefined;
+                        | undefined
+                      >
+                      | null
+                      | undefined;
                     }) => (
                       <Text
                         key={genre.id}
@@ -576,58 +577,55 @@ const MovieDetails = () => {
             <View className="mt-2">
               <Text className="text-text text-lg">Trailer</Text>
               <View className="max-w-full flex justify-center items-center mt-1">
-                {officialTrailer ? (
-                  <YoutubeView
-                    useInlineHtml={false}
-                    player={player}
-                    height={Platform.OS === "web" ? "auto" : undefined}
-                    webViewProps={{
-                      renderToHardwareTextureAndroid: true,
-                    }}
-                    style={{
-                      minWidth: 344,
-                    }}
-                    iframeStyle={{
-                      aspectRatio: 16 / 9,
-                    }}
-                  />
+                {trailerKey ? (
+                  <TrailerSection videoKey={trailerKey}/>
+                ) : officialTrailer === null && movie?.videos?.results?.length > 0 ? (
+                  // Edge case: videos exist, but none are suitable (rare)
+                  <View className="w-full aspect-video bg-gray-900/50 rounded-xl justify-center items-center">
+                    <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
+                    <Text className="text-gray-400 text-center px-6">
+                      No playable trailer available
+                    </Text>
+                  </View>
                 ) : (
-                  <ActivityIndicator
-                    size="large"
-                    color="white"
-                    style={{ alignSelf: "center" }}
-                  />
+                  // No videos at all → clean empty state
+                  <View className="w-full aspect-video bg-gray-900/50 rounded-xl justify-center items-center">
+                    <Image source={require("../../assets/images/sad.png")} className="w-[80px] h-[80px] opacity-70" resizeMode="contain" />
+                    <Text className="text-gray-400 text-center px-6">
+                      Trailer not available
+                    </Text>
+                  </View>
                 )}
               </View>
             </View>
-          <View className="mt-4 px-1">
-            <Text className="text-text mb-1">Similar Vibes</Text>
-            {isLoadingSimilar ? (
-              <View className="flex flex-1 self-center justify-center items-center">
-                <LoaderKitView
-                  name="BallClipRotateMultiple"
-                  style={{ width: 50, height: 50 }}
-                  color={"#efe4ef"}
-                  className="mt-20"
-                />
-              </View>
-            ) : errorSimilar ? (
-              <View className="flex-1">
-                <Image
-                  source={require("../../assets/images/nothing.png")}
-                  resizeMode="contain"
-                  className="w-full h-[100px] rounded-md mt-2"
-                />
-                <Text className="text-text text-center mt-1 text-sm">
-                  Oops...An error occurred
-                </Text>
-              </View>
-            ) : (
-              <View>
-                <MovieList movies={similarMovies ?? []} horizontal={true} />
-              </View>
-            )}
-          </View>
+            <View className="mt-4 px-1">
+              <Text className="text-text mb-1">Similar Vibes</Text>
+              {isLoadingSimilar ? (
+                <View className="flex flex-1 self-center justify-center items-center">
+                  <LoaderKitView
+                    name="BallClipRotateMultiple"
+                    style={{ width: 50, height: 50 }}
+                    color={"#efe4ef"}
+                    className="mt-20"
+                  />
+                </View>
+              ) : errorSimilar ? (
+                <View className="flex-1">
+                  <Image
+                    source={require("../../assets/images/nothing.png")}
+                    resizeMode="contain"
+                    className="w-full h-[100px] rounded-md mt-2"
+                  />
+                  <Text className="text-text text-center mt-1 text-sm">
+                    Oops...An error occurred
+                  </Text>
+                </View>
+              ) : (
+                <View>
+                  <MovieList movies={similarMovies ?? []} horizontal={true} />
+                </View>
+              )}
+            </View>
           </View>
         </ScrollView>
       )}
