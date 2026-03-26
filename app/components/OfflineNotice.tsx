@@ -1,6 +1,6 @@
 import { useNetInfo } from '@react-native-community/netinfo';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, Text, View, Image } from 'react-native';
 import debounce from 'lodash/debounce';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -75,19 +75,24 @@ export default function OfflineNotice({
 
     // Full-screen overlay
     return (
-        <SafeAreaView className='relative'>
-            <View className="absolute inset-0 bg-black/85 items-center justify-center z-[10000]">
-                <View className="bg-gray-800 rounded-2xl p-8 items-center w-[80%] max-w-[360px]">
-                    <Text className="text-red-400 text-2xl font-bold mb-4">
-                        No Internet Connection
-                    </Text>
-                    <Text className="text-gray-300 text-base text-center mb-3">
-                        This app requires an internet connection to load movie data, trailers, and more.
-                    </Text>
-                    <Text className="text-gray-500 text-sm text-center">
-                        Connect to Wi-Fi or mobile data and try again.
-                    </Text>
+        <SafeAreaView className='relative bg-primary/80 flex-1 flex justify-center items-center px-4'>
+            <View className="bg-background rounded-2xl p-8 w-[85%] max-w-[380px] flex justify-center items-center">
+                <View className="flex justify-center items-center mb-4">
+                    <Image
+                        source={require("../../assets/images/no-net.png")}
+                        resizeMode="cover"
+                        className="w-[300px] h-[300px] rounded-md mt-6"
+                    />
                 </View>
+                <Text className="text-red-400 text-2xl font-bold mb-4">
+                    No Internet Connection
+                </Text>
+                <Text className="text-gray-300 text-base text-center mb-3">
+                    This app requires an internet connection to load movie data, trailers, and more.
+                </Text>
+                <Text className="text-gray-500 text-sm text-center">
+                    Connect to Wi-Fi or mobile data and try again.
+                </Text>
             </View>
         </SafeAreaView>
     );

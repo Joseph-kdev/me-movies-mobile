@@ -1,14 +1,18 @@
-import { Text, View, ScrollView, Image, Pressable, StatusBar } from "react-native";
+import { Text, View, ScrollView, Image, Pressable, StatusBar, TouchableOpacity, FlatList } from "react-native";
 import CarouselComponent from "../components/MovieCarousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchMovies, getTopRated } from "../services/requests";
 import MovieList from "../components/MovieList";
 import { Search } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import LoaderKitView from "react-native-loader-kit";
+import { getRecentMovies } from "../components/recent";
+import { useCallback, useState } from "react";
+import { Movie } from "../components/MovieCard";
 
 export default function Index() {
+  const [recentFinds, setRecentFinds] = useState([]);
   const {
     data: trending,
     isLoading: isLoadingTrending,
@@ -16,10 +20,8 @@ export default function Index() {
   } = useQuery({
     queryKey: ["trending"],
     queryFn: () => fetchMovies(""),
-    staleTime: 3600000,
   });
 
-  // ── Top Rated Movies ──
   const {
     data: topRatedMovies,
     isLoading: isLoadingTopMovies,
@@ -27,10 +29,8 @@ export default function Index() {
   } = useQuery({
     queryKey: ["top-rated", "movie"],
     queryFn: () => getTopRated("movie"),
-    staleTime: 3600000, // 1 hour — adjust as needed
   });
 
-  // ── Top Rated TV Shows ──
   const {
     data: topRatedShows,
     isLoading: isLoadingTopShows,
@@ -38,8 +38,37 @@ export default function Index() {
   } = useQuery({
     queryKey: ["top-rated", "tv"],
     queryFn: () => getTopRated("tv"),
-    staleTime: 3600000,
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      const fresh = getRecentMovies();
+      setRecentFinds(fresh);
+    }, [])
+  );
+
+const renderMovie = ({ item }: { item: Movie }) => (
+    <TouchableOpacity
+      onPress={() => {
+        router.push({ pathname: item.type === 'movie' ? "/movies/[id]" : '/tv/[id]', params: { id: item.id } });
+      }}
+      className="w-[40vw] mr-3 rounded-xl overflow-hidden shadow-lg shadow-black/40 relative"
+    >
+      <Image
+        source={{ uri: `https://image.tmdb.org/t/p/w200${item.poster_path}` }}
+        className="w-full aspect-[4/3] rounded-t-xl object-top"
+        resizeMode="cover"
+      />
+      <View className="absolute left-2 bottom-2 bg-[rgba(0,0,0,0.6)] p-1 rounded-lg">
+        <Text
+          className="text-white text-sm font-medium text-center leading-tight"
+          numberOfLines={2}
+        >
+          {item.title || item.name}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   const router = useRouter();
   return (
@@ -61,6 +90,25 @@ export default function Index() {
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 60 }}
       >
         <CarouselComponent />
+        {recentFinds.length > 0 && (
+          <View className="mt-4">
+            <Text className="text-text mb-1">
+              Recent Finds
+            </Text>
+            <View>
+              <FlatList
+                data={recentFinds}
+                horizontal
+                ItemSeparatorComponent={() => <View className="w-2" />}
+                maxToRenderPerBatch={10}
+                renderItem={renderMovie}
+                keyExtractor={(item) => item.id}
+                className="mt-2"
+              />
+            </View>
+          </View>
+        )}
+
         <View className="mt-4">
           <Text className="text-text mb-1">Trending Today</Text>
           {isLoadingTrending ? (

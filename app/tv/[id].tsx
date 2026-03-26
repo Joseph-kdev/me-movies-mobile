@@ -39,6 +39,7 @@ import LoaderKitView from "react-native-loader-kit";
 import MovieList from "../components/MovieList";
 import { toast } from "sonner-native";
 import TrailerSection from "../components/TrailerSection";
+import { addToRecent } from "../components/recent";
 
 const TvDetails = () => {
   let { id } = useLocalSearchParams() as any;
@@ -314,6 +315,18 @@ const TvDetails = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (!tvShow) return;
+  
+    if (tvShow.id) {
+      try {
+        addToRecent({...tvShow, type:'tv'});
+      } catch (err) {
+        console.log("Failed to add to recent:", err);
+      }
+    }
+  }, [tvShow?.id]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">

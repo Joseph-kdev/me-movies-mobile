@@ -9,9 +9,6 @@ dist/
 web-build/
 expo-env.d.ts
 
-google-services.json
-GoogleService-Info.plist
-
 
 # Native
 .kotlin/
@@ -24,6 +21,8 @@ GoogleService-Info.plist
 
 # Metro
 .metro-health-check*
+google-services.json
+GoogleService-Info.plist
 
 # debug
 npm-debug.*
