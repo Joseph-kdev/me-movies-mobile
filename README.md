@@ -1,50 +1,46 @@
-# Welcome to your Expo app 👋
+# MeMovies Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+MeMovies Mobile is a mobile application for movie and TV show enthusiasts. It allows you to explore, search, and curate your personal watching catalog with ease, ensuring all your preferences are synced with the MeMovies web version.
 
-## Get started
+## Key Features
 
-1. Install dependencies
+- **Browse** movies and TV shows by genre to discover new content.
+- **Search** for specific movies and TV shows easily.
+- **Curate your catalogue**: Save favorites, add items to your watchlists, and mark films as watched.
+- **Seamless Syncing**: Your user details and film catalogues are synced in real-time with the web version.
 
+## Screenshots
+
+<div style="display: flex; flex-direction: row; overflow-x: auto; gap: 10px;">
+  <img src="./assets/screenshots/Screenshot_20260518_161728_MeMovies.jpg" width="200" />
+  <img src="./assets/screenshots/Screenshot_20260518_161756_MeMovies.jpg" width="200" />
+  <img src="./assets/screenshots/Screenshot_20260518_161837_MeMovies.jpg" width="200" />
+  <img src="./assets/screenshots/Screenshot_20260518_161852_MeMovies.jpg" width="200" />
+  <img src="./assets/screenshots/Screenshot_20260518_161901_MeMovies.jpg" width="200" />
+</div>
+
+## Download Beta Release
+
+A beta release of the app is available for download! Head over to the **Releases** section of this repository on GitHub to download the latest installation files and try it out on your device. 
+
+## Contributing
+
+We welcome contributions from the community! If you are willing to contribute, please follow these steps:
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix (`git checkout -b feature/your-feature-name`).
+3. Commit your changes (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/your-feature-name`).
+5. Open a Pull Request.
+
+Feel free to open an issue for any bugs you find or features you would like to request.
+
+## Local Development Setup
+
+1. Install dependencies:
    ```bash
    npm install
    ```
-
-2. Start the app
-
+2. Start the app:
    ```bash
    npx expo start
    ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
